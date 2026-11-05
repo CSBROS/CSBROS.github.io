@@ -1,0 +1,1224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>Nana Owusu Research Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Interactive research record on S&amp;P 500 and Nasdaq-100 futures: replay each hypothesis from first estimate to unseen data, operate every study's figure, and test the methods yourself.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: an interactive research lab. Hero forest plot with a replay toggle; a study explorer (verdict filters, list,
+   detail with a live figure); two method labs; a session clock for the live system; a point-in-time timeline for open work. */
+:root {
+  --paper: #f1f2ef; --surface: #fafbf9; --ink: #13161b; --ink-2: #454b53; --muted: #6c727a;
+  --rule: #d5d8d2; --rule-2: #b9bdb6; --accent: #2747b0; --band: rgba(39, 71, 176, 0.07); --hover: rgba(19, 22, 27, 0.04);
+  --sel: rgba(39, 71, 176, 0.09); --region: rgba(21, 117, 85, 0.07);
+  --pass: #157555; --fail: #b3261e; --null: #59626e; --open: #9a5a00;
+  --bar: #9aa1aa; --bar-hi: #2747b0;
+  --f-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0e1013; --surface: #15181c; --ink: #e8eae6; --ink-2: #b3b8be; --muted: #8b9199;
+    --rule: #272b31; --rule-2: #3b4047; --accent: #93a9ff; --band: rgba(147, 169, 255, 0.08); --hover: rgba(232, 234, 230, 0.05);
+    --sel: rgba(147, 169, 255, 0.12); --region: rgba(76, 196, 151, 0.08);
+    --pass: #4cc497; --fail: #ff8b80; --null: #a3acb7; --open: #f0b24a;
+    --bar: #5d646d; --bar-hi: #93a9ff;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0e1013; --surface: #15181c; --ink: #e8eae6; --ink-2: #b3b8be; --muted: #8b9199;
+  --rule: #272b31; --rule-2: #3b4047; --accent: #93a9ff; --band: rgba(147, 169, 255, 0.08); --hover: rgba(232, 234, 230, 0.05);
+  --sel: rgba(147, 169, 255, 0.12); --region: rgba(76, 196, 151, 0.08);
+  --pass: #4cc497; --fail: #ff8b80; --null: #a3acb7; --open: #f0b24a;
+  --bar: #5d646d; --bar-hi: #93a9ff;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums; }
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, input:focus-visible, svg:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1160px; margin-inline: auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 40px; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.mono { font-family: var(--f-mono); }
+
+.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 24px; padding-block: 20px 14px; border-bottom: 1px solid var(--rule); }
+.top .id { font-family: var(--f-mono); font-size: 13px; color: var(--ink); text-decoration: none; }
+.top nav { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 14px; }
+.top nav a { color: var(--ink-2); text-decoration: none; }
+.top nav a:hover { color: var(--ink); text-decoration: underline; }
+
+.hero { display: grid; gap: 18px; padding-block: 52px 4px; }
+.kicker { font-family: var(--f-mono); font-size: 13px; color: var(--muted); margin: 0; }
+h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(42px, 6.6vw, 80px); line-height: 0.97; letter-spacing: -0.015em; margin: 0; max-width: 13ch; text-wrap: balance; }
+.lede { font-size: clamp(17px, 1.7vw, 19.5px); line-height: 1.5; color: var(--ink-2); margin: 0; max-width: 60ch; }
+
+/* controls */
+.seg { display: inline-flex; max-width: 100%; overflow-x: auto; border: 1px solid var(--rule-2); border-radius: 3px; background: var(--surface); }
+.seg button { flex: none; font-family: var(--f-mono); font-size: 12.5px; padding: 6px 11px; border: 0; background: transparent; color: var(--ink-2); cursor: pointer; white-space: nowrap; }
+.seg button + button { border-left: 1px solid var(--rule-2); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.btn { display: inline-flex; align-items: center; gap: 8px; font-family: var(--f-body); font-weight: 500; font-size: 14.5px; padding: 8px 14px; border: 1.5px solid var(--ink); color: var(--ink); background: transparent; text-decoration: none; border-radius: 3px; cursor: pointer; }
+.btn:hover { background: var(--ink); color: var(--paper); }
+.btn.small { font-size: 13px; padding: 5px 10px; border-width: 1px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--f-mono); font-size: 12.5px; padding: 5px 11px; border: 1px solid var(--rule-2); border-radius: 999px; background: transparent; color: var(--ink-2); cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.chip span { opacity: 0.7; margin-left: 4px; }
+.ctl { display: grid; gap: 6px; min-width: 0; }
+.ctl label { font-size: 13.5px; color: var(--ink-2); display: flex; justify-content: space-between; gap: 12px; }
+.ctl output { font-family: var(--f-mono); color: var(--ink); }
+input[type="range"] { width: 100%; accent-color: var(--accent); margin: 0; }
+
+/* forest plot */
+.forest { margin: 32px 0 0; border-top: 2px solid var(--ink); }
+.fig-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px 24px; padding-block: 14px 8px; }
+.fig-head h2 { font-family: var(--f-display); font-weight: 600; font-size: 21px; margin: 0; }
+.fig-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.frow { display: grid; grid-template-columns: minmax(0, 17rem) minmax(0, 1fr) 8rem; gap: 6px 22px; align-items: center; width: calc(100% + 16px); padding: 11px 8px; margin-inline: -8px; border: 0; border-bottom: 1px solid var(--rule); background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.frow:hover, .frow:focus-visible { background: var(--hover); }
+.frow .lab { min-width: 0; }
+.frow .lab b { display: block; font-weight: 600; font-size: 15px; line-height: 1.3; }
+.frow .lab span { display: block; font-size: 12.5px; color: var(--muted); line-height: 1.4; margin-top: 2px; }
+.track { position: relative; height: 26px; }
+.track i { position: absolute; display: block; }
+.track .band { top: 0; bottom: 0; left: calc(6px + (100% - 12px) * 0.25); width: calc((100% - 12px) * 0.5); background: var(--band); }
+.track .zero { top: 0; bottom: 0; left: calc(6px + (100% - 12px) * 0.5); width: 1px; background: var(--rule-2); }
+.track .lnk { top: 50%; height: 2px; margin-top: -1px; background: var(--c); opacity: 0.45; }
+.track .dot { top: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; background: var(--c); border: 2px solid var(--c); }
+.track .dot.hollow { background: var(--paper); }
+.anim .track .dot, .anim .track .lnk { transition: left 900ms cubic-bezier(0.2, 0.7, 0.2, 1), width 900ms cubic-bezier(0.2, 0.7, 0.2, 1), opacity 400ms; }
+.frow.dim .dot, .frow.dim .lnk { opacity: 0.25; }
+.vals { font-family: var(--f-mono); font-size: 13.5px; text-align: right; white-space: nowrap; color: var(--ink); }
+.vals em { display: block; font-style: normal; font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--c); margin-top: 1px; }
+.faxis { cursor: default; border-bottom: 0; padding-block: 6px 0; }
+.faxis:hover { background: transparent; }
+.ticks { height: 18px; }
+.ticks span { position: absolute; top: 0; transform: translateX(-50%); font-family: var(--f-mono); font-size: 11.5px; color: var(--muted); }
+.faxis .vals { font-size: 11.5px; color: var(--muted); }
+.fig-note { font-size: 14px; color: var(--ink-2); margin: 14px 0 0; max-width: 80ch; }
+
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 32px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.stat { padding: 16px 18px 16px 0; min-width: 0; }
+.stat + .stat { padding-left: 18px; border-left: 1px solid var(--rule); }
+.stat b { display: block; font-family: var(--f-display); font-weight: 600; font-size: clamp(26px, 3vw, 34px); line-height: 1.1; }
+.stat span { display: block; font-size: 13.5px; color: var(--ink-2); margin-top: 4px; }
+
+.sec { padding-block: 72px 0; }
+.sec-head { display: grid; gap: 10px; margin-bottom: 22px; max-width: 72ch; }
+.sec-head h2 { font-family: var(--f-display); font-weight: 600; font-size: clamp(30px, 3.6vw, 42px); line-height: 1.04; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+.sec-head p { margin: 0; color: var(--ink-2); font-size: 16.5px; }
+
+/* explorer */
+.filters { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; border-top: 2px solid var(--ink); padding-top: 16px; margin-bottom: 18px; }
+.explorer { display: grid; grid-template-columns: minmax(0, 19rem) minmax(0, 1fr); gap: 28px 36px; align-items: start; }
+.slist { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.sitem { display: grid; gap: 6px; text-align: left; padding: 12px 12px; border: 1px solid transparent; border-radius: 3px; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.sitem:hover { background: var(--hover); }
+.sitem[aria-selected="true"] { background: var(--surface); border-color: var(--rule); }
+.sitem .t { font-weight: 600; font-size: 15px; line-height: 1.3; }
+.sitem .k { font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+.stamp { justify-self: start; font-family: var(--f-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 8px; border: 1.5px solid currentColor; border-radius: 3px; color: var(--null); white-space: nowrap; }
+.stamp.fail { color: var(--fail); } .stamp.pass { color: var(--pass); } .stamp.open { color: var(--open); } .stamp.desc { color: var(--accent); }
+.sdetail { min-width: 0; }
+.sdetail .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.sdetail .area { font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+.sdetail h3 { font-family: var(--f-display); font-weight: 600; font-size: clamp(24px, 2.6vw, 30px); line-height: 1.12; margin: 10px 0 6px; text-wrap: balance; }
+.sdetail .q { margin: 0; color: var(--ink-2); max-width: 70ch; }
+.fig { border: 1px solid var(--rule); background: var(--surface); border-radius: 3px; padding: 18px; margin: 18px 0 20px; min-width: 0; }
+.fig-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-bottom: 16px; }
+.fig-ctl .lbl { font-size: 13px; color: var(--ink-2); }
+.fig-read { font-family: var(--f-mono); font-size: 13px; color: var(--ink); margin: 12px 0 0; min-height: 1.5em; }
+.fig-cap { font-size: 13.5px; color: var(--ink-2); margin: 12px 0 0; max-width: 80ch; }
+.sdetail dl { display: grid; grid-template-columns: 6.8rem minmax(0, 1fr); gap: 10px 18px; margin: 0; font-size: 15px; max-width: 78ch; }
+.sdetail dt { font-family: var(--f-mono); font-size: 11.5px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); padding-top: 3px; }
+.sdetail dd { margin: 0; min-width: 0; }
+.sdetail dd ul { margin: 0; padding-left: 1.1em; }
+.sdetail dd li + li { margin-top: 5px; }
+.sdetail dd.take { font-weight: 500; }
+.code-link { font-family: var(--f-mono); font-size: 13px; display: inline-block; margin-top: 14px; }
+
+/* html bar chart */
+.hb { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr) 7rem; column-gap: 16px; row-gap: 9px; align-items: center; }
+.hb-lab { font-size: 13.5px; line-height: 1.3; min-width: 0; }
+.hb-lab small { display: block; font-size: 11.5px; color: var(--muted); }
+.hb-track { position: relative; height: 22px; background: var(--band); }
+.hb-track i { position: absolute; top: 3px; bottom: 3px; display: block; background: var(--bar); border-radius: 1px; }
+.hb-track i.hi { background: var(--bar-hi); } .hb-track i.pos { background: var(--pass); } .hb-track i.neg { background: var(--fail); }
+.hb-track b.mk { position: absolute; top: -3px; bottom: -3px; width: 0; border-left: 2px solid var(--ink); }
+.hb-val { font-family: var(--f-mono); font-size: 12.5px; text-align: right; white-space: nowrap; color: var(--ink); }
+.hb-val small { display: block; font-size: 11px; color: var(--muted); }
+.hb-over { grid-column: 2; position: relative; pointer-events: none; align-self: stretch; z-index: 1; }
+.hb-over i { position: absolute; top: -4px; bottom: -4px; width: 0; }
+.hb-over i.z { border-left: 1px solid var(--ink-2); }
+.hb-over i.r { border-left: 1.5px dashed var(--ink-2); }
+.hb-axis { grid-column: 2; position: relative; height: 16px; }
+.hb-axis span { position: absolute; transform: translateX(-50%); font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
+.hb-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12.5px; color: var(--ink-2); margin-top: 10px; }
+.hb-legend i { display: inline-block; width: 18px; height: 0; border-top: 1.5px dashed var(--ink-2); vertical-align: middle; margin-right: 6px; }
+.hb-legend i.mk { border-top: 0; border-left: 2px solid var(--ink); height: 12px; width: 0; margin-right: 8px; }
+
+.mini-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 16px; }
+.mini-table th { text-align: left; font-family: var(--f-mono); font-weight: 400; font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); padding: 6px 10px 6px 0; border-bottom: 1px solid var(--rule-2); }
+.mini-table td { padding: 7px 10px 7px 0; border-bottom: 1px solid var(--rule); }
+.mini-table td.n { font-family: var(--f-mono); }
+.kpis { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.kpi { border: 1px solid var(--rule); padding: 8px 12px; border-radius: 3px; background: var(--paper); }
+.kpi b { display: block; font-family: var(--f-mono); font-size: 18px; font-weight: 500; }
+.kpi span { font-size: 12.5px; color: var(--ink-2); }
+.strip { position: relative; height: 34px; margin-top: 14px; background: var(--band); }
+.strip i { position: absolute; top: 6px; bottom: 6px; background: var(--bar-hi); opacity: 0.35; }
+.strip b { position: absolute; top: 2px; bottom: 2px; width: 0; border-left: 2px solid var(--ink); }
+.strip-axis { position: relative; height: 16px; }
+.strip-axis span { position: absolute; transform: translateX(-50%); font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
+.prop-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 22px; }
+
+/* labs */
+.lab { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 22px 36px; border-top: 2px solid var(--ink); padding-top: 18px; align-items: start; }
+.lab + .lab { margin-top: 48px; }
+.lab h3 { font-family: var(--f-display); font-weight: 600; font-size: clamp(22px, 2.4vw, 27px); line-height: 1.12; margin: 4px 0 8px; text-wrap: balance; }
+.lab-side { display: grid; gap: 14px; min-width: 0; }
+.lab-side p { margin: 0; color: var(--ink-2); font-size: 15px; }
+.plot { position: relative; min-width: 0; }
+.plot svg { display: block; width: 100%; touch-action: none; }
+.plot text { fill: var(--muted); font-family: var(--f-mono); font-size: 11px; }
+.plot text.lbl { fill: var(--ink-2); font-size: 11.5px; paint-order: stroke; stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round; }
+.plot text.you { fill: var(--accent); font-weight: 500; font-size: 12px; paint-order: stroke; stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round; }
+.plot-box { border: 1px solid var(--rule); background: var(--surface); border-radius: 3px; padding: 12px; }
+.readout { font-family: var(--f-mono); font-size: 13.5px; line-height: 1.65; padding: 12px 14px; border: 1px solid var(--rule); background: var(--surface); border-radius: 3px; }
+.readout .big { font-size: 22px; font-weight: 500; display: block; line-height: 1.3; }
+.readout .pos { color: var(--pass); } .readout .neg { color: var(--fail); }
+.note { font-size: 13.5px; color: var(--ink-2); margin: 0; }
+
+/* session clock */
+.clock { border-top: 2px solid var(--ink); padding-top: 18px; }
+.clock-now { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; margin-bottom: 12px; }
+.clock-now b { font-family: var(--f-display); font-weight: 600; font-size: 34px; line-height: 1; }
+.clock-now span { font-family: var(--f-mono); font-size: 13px; color: var(--muted); }
+.ctrack { position: relative; height: 54px; background: var(--surface); border: 1px solid var(--rule); border-radius: 3px; overflow: hidden; }
+.ctrack .seg-span { position: absolute; top: 0; bottom: 0; border-right: 1px solid var(--rule); display: flex; align-items: flex-end; padding: 0 6px 6px; font-size: 11.5px; color: var(--ink-2); overflow: hidden; white-space: nowrap; cursor: pointer; background: transparent; border-top: 0; border-left: 0; border-bottom: 0; font-family: var(--f-body); text-align: left; }
+.ctrack .seg-span.on { background: var(--sel); color: var(--ink); font-weight: 500; }
+.ctrack .seg-span.rel { top: 0; bottom: auto; height: 20px; align-items: center; padding: 0 6px; background: var(--band); border: 0; z-index: 2; font-family: var(--f-mono); font-size: 11px; }
+.ctrack .seg-span.rel.on { background: var(--open); color: var(--paper); }
+.ctrack .needle { position: absolute; top: 0; bottom: 0; width: 0; border-left: 2px solid var(--ink); z-index: 3; pointer-events: none; }
+.caxis { position: relative; height: 18px; margin-top: 4px; }
+.caxis span { position: absolute; transform: translateX(-50%); font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
+#clock-range { margin-top: 10px; }
+.clock-detail { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 18px 36px; margin-top: 20px; }
+.clock-detail h3 { font-family: var(--f-display); font-weight: 600; font-size: 24px; margin: 0 0 6px; }
+.clock-detail p { margin: 0 0 10px; color: var(--ink-2); }
+.clock-detail ul { margin: 0; padding-left: 1.1em; color: var(--ink-2); display: grid; align-content: start; gap: 6px; font-size: 15px; }
+.models { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 28px; }
+.model { padding: 20px 22px; border: 1px solid var(--rule); background: var(--surface); border-radius: 3px; min-width: 0; }
+.model h3 { font-family: var(--f-display); font-weight: 600; font-size: 20px; margin: 4px 0 6px; }
+.model p { margin: 0; font-size: 15px; color: var(--ink-2); }
+
+/* open work */
+.open-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.open-side { display: grid; gap: 18px; min-width: 0; }
+.card { background: var(--surface); border: 1px solid var(--rule); border-radius: 3px; padding: 22px; min-width: 0; }
+.card .status { font-family: var(--f-mono); font-size: 11.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--open); margin: 0; }
+.card h3 { font-family: var(--f-display); font-weight: 600; font-size: clamp(21px, 2.2vw, 25px); line-height: 1.15; margin: 6px 0 10px; text-wrap: balance; }
+.card p { margin: 0 0 12px; font-size: 15px; color: var(--ink-2); }
+.card ul { margin: 0; padding-left: 1.1em; font-size: 15px; color: var(--ink-2); display: grid; gap: 6px; }
+.pit { margin: 18px 0 8px; padding: 16px; border: 1px solid var(--rule); background: var(--paper); border-radius: 3px; }
+.pit-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; align-items: baseline; margin-bottom: 12px; }
+.pit-head b { font-family: var(--f-display); font-weight: 600; font-size: 17px; }
+.pit-rows { display: grid; grid-template-columns: minmax(0, 12rem) minmax(0, 1fr) 5.4rem; column-gap: 12px; row-gap: 7px; align-items: center; }
+.pit-lab { font-size: 13px; line-height: 1.3; min-width: 0; }
+.pit-track { position: relative; height: 18px; background: var(--band); }
+.pit-track i { position: absolute; top: 5px; height: 8px; border-radius: 4px; }
+.pit-track i.pt { width: 12px; height: 12px; top: 3px; margin-left: -6px; border-radius: 50%; }
+.pit-row.in i { background: var(--pass); } .pit-row.out i { background: var(--fail); opacity: 0.85; }
+.pit-st { font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; text-align: right; }
+.pit-row.in .pit-st { color: var(--pass); } .pit-row.out .pit-st { color: var(--fail); }
+.pit-over { grid-column: 2; position: relative; pointer-events: none; align-self: stretch; z-index: 1; }
+.pit-over i { position: absolute; top: -6px; bottom: -6px; width: 0; }
+.pit-over i.cut { border-left: 2px solid var(--ink); }
+.pit-over i.ann { border-left: 2px dashed var(--open); }
+.pit-axis { grid-column: 2; position: relative; height: 16px; }
+.pit-axis span { position: absolute; transform: translateX(-50%); font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
+.pit-ctl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 18px; align-items: end; margin-top: 14px; }
+.pit-msg { font-size: 13.5px; margin: 10px 0 0; color: var(--ink-2); }
+.pit-msg.warn { color: var(--fail); }
+.leaks { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 8px; }
+.leaks th { text-align: left; font-family: var(--f-mono); font-weight: 400; font-size: 11px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); padding: 6px 12px 6px 0; border-bottom: 1px solid var(--rule-2); }
+.leaks td { padding: 8px 12px 8px 0; border-bottom: 1px solid var(--rule); vertical-align: top; color: var(--ink-2); }
+.leaks td:first-child { width: 34%; color: var(--ink); font-weight: 500; }
+details.more summary { cursor: pointer; font-family: var(--f-mono); font-size: 13px; color: var(--accent); margin-top: 12px; }
+
+.principles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px 36px; border-top: 2px solid var(--ink); padding-top: 22px; }
+.principles h3 { font-family: var(--f-display); font-weight: 600; font-size: 20px; margin: 0 0 6px; }
+.principles p { margin: 0; font-size: 15px; color: var(--ink-2); }
+.about { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 28px 48px; border-top: 2px solid var(--ink); padding-top: 22px; }
+.about p { margin: 0 0 14px; max-width: 62ch; color: var(--ink-2); font-size: 16.5px; }
+.facts { display: grid; grid-template-columns: 6.4rem minmax(0, 1fr); gap: 10px 16px; margin: 0; font-size: 15px; }
+.facts dt { font-family: var(--f-mono); font-size: 11.5px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); padding-top: 3px; }
+.facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.copy { font-family: var(--f-mono); font-size: 12px; margin-left: 8px; padding: 2px 8px; border: 1px solid var(--rule-2); border-radius: 3px; background: transparent; color: var(--ink-2); cursor: pointer; }
+footer { margin-top: 72px; padding-top: 18px; border-top: 1px solid var(--rule); font-size: 13px; color: var(--muted); display: grid; gap: 6px; }
+footer p { margin: 0; max-width: 90ch; }
+
+@media (max-width: 960px) {
+  .lab, .open-grid, .clock-detail { grid-template-columns: minmax(0, 1fr); }
+  .principles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 860px) {
+  .explorer { grid-template-columns: minmax(0, 1fr); }
+  .slist { flex-direction: row; overflow-x: auto; padding-bottom: 6px; gap: 8px; }
+  .sitem { flex: 0 0 15.5rem; border-color: var(--rule); }
+}
+@media (max-width: 760px) {
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stat:nth-child(3) { padding-left: 0; border-left: 0; }
+  .stat:nth-child(n+3) { border-top: 1px solid var(--rule); }
+  .about, .models, .prop-grid { grid-template-columns: minmax(0, 1fr); }
+  .ctrack .seg-span { font-size: 0; }
+  .ctrack .seg-span.rel { font-size: 0; }
+  .caxis span.minor { display: none; }
+}
+@media (max-width: 700px) {
+  .frow { grid-template-columns: minmax(0, 1fr) 6.6rem; gap: 6px 14px; }
+  .frow .lab { grid-column: 1 / -1; }
+  .faxis .lab { display: none; }
+  .principles { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .hb { grid-template-columns: minmax(0, 7.2rem) minmax(0, 1fr) 4.8rem; column-gap: 10px; }
+  .hb-val small { display: none; }
+  .pit-rows { grid-template-columns: minmax(0, 7rem) minmax(0, 1fr) 3.6rem; }
+  .sdetail dl { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .sdetail dd { margin-bottom: 10px; }
+  .hero { padding-block: 40px 4px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .anim .track .dot, .anim .track .lnk { transition: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="id" href="#top" id="top">Nana Owusu Research Lab</a>
+    <nav aria-label="Sections">
+      <a href="#research">Explorer</a>
+      <a href="#labs">Labs</a>
+      <a href="#system">Live system</a>
+      <a href="#open">In progress</a>
+      <a href="#about">About</a>
+      <a href="tools/rr-matrix/index.html">R:R tool</a>
+      <a href="#" id="nav-github" hidden>GitHub</a>
+    </nav>
+  </header>
+
+  <section class="hero" aria-labelledby="h1">
+    <p class="kicker">Nana Owusu · Finance &amp; Business Intelligence · Augustana College</p>
+    <h1 id="h1">I test trading ideas until they break.</h1>
+    <p class="lede">Most of them break. Replay each hypothesis from the number that made it look real to the number it produced on data it had never seen, then open any study and work its figure yourself.</p>
+  </section>
+
+  <figure class="forest" id="forest" aria-labelledby="fig-title">
+    <div class="fig-head">
+      <h2 id="fig-title">Every headline test, first estimate against unseen data</h2>
+      <div class="fig-tools">
+        <div class="seg" role="group" aria-label="Which estimate to show" id="forest-mode">
+          <button type="button" data-mode="out" aria-pressed="true">Unseen data</button>
+          <button type="button" data-mode="ins" aria-pressed="false">First estimate</button>
+        </div>
+        <button type="button" class="btn small" id="forest-replay">Replay</button>
+      </div>
+    </div>
+    <div id="forest-rows"></div>
+    <div class="frow faxis" aria-hidden="true">
+      <div class="lab"></div>
+      <div class="track ticks">
+        <span style="left: 6px">−4</span>
+        <span style="left: calc(6px + (100% - 12px) * 0.25)">−2</span>
+        <span style="left: calc(6px + (100% - 12px) * 0.5)">0</span>
+        <span style="left: calc(6px + (100% - 12px) * 0.75)">+2</span>
+        <span style="left: calc(100% - 6px)">+4</span>
+      </div>
+      <div class="vals">t-statistic</div>
+    </div>
+    <figcaption class="fig-note" id="forest-note">Shaded band: |t| &lt; 2. Click a row to open the study below.</figcaption>
+  </figure>
+
+  <div class="stats">
+    <div class="stat"><b>174</b><span>regular sessions rebuilt from every CQG print</span></div>
+    <div class="stat"><b>2018–26</b><span>independent ES and NQ replication on exchange quotes</span></div>
+    <div class="stat"><b>560</b><span>parameter cells audited · deflated Sharpe 0.05</span></div>
+    <div class="stat"><b>1 of 8</b><span>headline effects that held on unseen data</span></div>
+  </div>
+
+  <!-- ============ EXPLORER ============ -->
+  <section class="sec" id="research" aria-labelledby="research-title">
+    <div class="sec-head">
+      <p class="eyebrow">Study explorer</p>
+      <h2 id="research-title">Eight studies. Pick one and work the figure.</h2>
+      <p>Tick-level data from a CQG feed with the aggressor side of every trade, costs charged on every fill, and random trades re-derived print by print before any result is reported.</p>
+    </div>
+    <div class="filters">
+      <div class="chips" role="group" aria-label="Filter by verdict" id="chips"></div>
+      <span class="eyebrow" id="count"></span>
+    </div>
+    <div class="explorer">
+      <div class="slist" id="slist" role="listbox" aria-label="Studies"></div>
+      <article class="sdetail" id="sdetail" aria-live="polite"></article>
+    </div>
+  </section>
+
+  <!-- ============ LABS ============ -->
+  <section class="sec" id="labs" aria-labelledby="labs-title">
+    <div class="sec-head">
+      <p class="eyebrow">Labs</p>
+      <h2 id="labs-title">Two ideas the studies keep coming back to</h2>
+      <p>A win rate only means something against the breakeven its reward-to-risk implies, and a strong t-statistic only means something next to the number of tries behind it.</p>
+    </div>
+
+    <div class="lab" id="lab-frontier">
+      <div class="plot-box"><div class="plot" id="frontier"></div></div>
+      <div class="lab-side">
+        <p class="eyebrow">Lab 1</p>
+        <h3>The breakeven frontier</h3>
+        <p>Each curve point is the win rate a bracket needs to break even. Drag the blue point, or click anywhere, to place a strategy. The grey points are the breakout rules from the study, at their realized win rates after costs.</p>
+        <div class="ctl">
+          <label for="fr-cost"><span>Cost per trade (slippage + commission)</span><output id="fr-cost-out" for="fr-cost">0.00R</output></label>
+          <input id="fr-cost" type="range" min="0" max="0.2" step="0.01" value="0">
+        </div>
+        <div class="readout" id="fr-read" aria-live="polite"></div>
+        <a class="btn" href="tools/rr-matrix/index.html">Open the full R:R matrix →</a>
+      </div>
+    </div>
+
+    <div class="lab" id="lab-mt">
+      <div class="plot-box"><div class="plot" id="mt-plot"></div></div>
+      <div class="lab-side">
+        <p class="eyebrow">Lab 2</p>
+        <h3>How many tries until chance looks like an edge?</h3>
+        <p>Each run draws strategies with no edge at all and plots their t-statistics. Try more variants and the best one drifts past 2 on luck alone.</p>
+        <div class="ctl">
+          <label for="mt-n"><span>Variants tried</span><output id="mt-n-out" for="mt-n">288</output></label>
+          <input id="mt-n" type="range" min="0" max="7" step="1" value="5">
+        </div>
+        <div><button type="button" class="btn small" id="mt-run">Run again</button></div>
+        <div class="readout" id="mt-read" aria-live="polite"></div>
+        <p class="note" id="mt-context"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LIVE SYSTEM ============ -->
+  <section class="sec" id="system" aria-labelledby="system-title">
+    <div class="sec-head">
+      <p class="eyebrow">Live system</p>
+      <h2 id="system-title">A trading day, by the clock</h2>
+      <p>The GEX and order-flow framework assumes dealer gamma positioning sets where price is likely to react, and aggressive order flow at those levels decides whether it does. Scrub through a session to see which part of the system runs when, and which study tests it.</p>
+    </div>
+    <div class="clock">
+      <div class="clock-now"><b id="clock-time">09:42 CT</b><span id="clock-seg"></span></div>
+      <div class="ctrack" id="ctrack"></div>
+      <div class="caxis" id="caxis"></div>
+      <input id="clock-range" type="range" min="180" max="990" step="5" value="582" aria-label="Time of day, Chicago">
+      <div class="clock-detail" id="clock-detail"></div>
+    </div>
+    <div class="models">
+      <div class="model">
+        <p class="eyebrow">Model A</p>
+        <h3>Positive-gamma reversal</h3>
+        <p>Net gamma at spot is positive, so dealer hedging dampens moves. Fade the approach to a graded level when the tape shows absorption.</p>
+      </div>
+      <div class="model">
+        <p class="eyebrow">Model B · current focus</p>
+        <h3>Negative-gamma breakout</h3>
+        <p>Net gamma at spot is negative, so hedging amplifies moves. Trading is narrowed to two setups, a failed retest of a broken level and a break from the edge of balance, with a review at 30 trades.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ IN PROGRESS ============ -->
+  <section class="sec" id="open" aria-labelledby="open-title">
+    <div class="sec-head">
+      <p class="eyebrow">In progress</p>
+      <h2 id="open-title">Open work, and where support would help</h2>
+      <p>Two of these projects need licensed data and a faculty sponsor. Both follow the same standard as the studies above: the design is fixed before the result is seen.</p>
+    </div>
+    <div class="open-grid">
+      <article class="card">
+        <p class="status">Building the point-in-time panel</p>
+        <h3>Predicting abnormal earnings surprises</h3>
+        <p>The target is the part of the surprise that expectations management does not explain: Street EPS minus consensus, scaled by price, minus the firm's own trailing median surprise, ranked into terciles each quarter. Data: I/B/E/S detail and actuals, Compustat Quarterly, CRSP and OptionMetrics through WRDS. Gradient-boosted trees under walk-forward validation, required to beat simple baselines.</p>
+        <div class="pit">
+          <div class="pit-head"><b>What the model may see for one company-quarter</b><span class="eyebrow">Illustration</span></div>
+          <div class="pit-rows" id="pit-rows"></div>
+          <div class="pit-ctl">
+            <div class="ctl">
+              <label for="pit-cut"><span>Information cutoff</span><output id="pit-cut-out" for="pit-cut">day −1</output></label>
+              <input id="pit-cut" type="range" min="-60" max="5" step="1" value="-1">
+            </div>
+            <div class="seg" role="group" aria-label="Report timing" id="pit-timing">
+              <button type="button" data-t="pre" aria-pressed="true">Before the open</button>
+              <button type="button" data-t="post" aria-pressed="false">After the close</button>
+            </div>
+          </div>
+          <p class="pit-msg" id="pit-msg"></p>
+        </div>
+        <details class="more">
+          <summary>Where a panel like this leaks, and the control for each</summary>
+          <table class="leaks">
+            <thead><tr><th>Risk</th><th>Control</th></tr></thead>
+            <tbody>
+              <tr><td>Estimates not yet public</td><td>I/B/E/S detail history; an estimate counts only if announced, and not stopped, by the day before.</td></tr>
+              <tr><td>Split-adjustment rounding</td><td>Unadjusted estimates and actuals, rescaled with CRSP share factors (Payne &amp; Thomas, 2003).</td></tr>
+              <tr><td>Wrong event date</td><td>Earlier of the I/B/E/S and Compustat dates; after-close reports move the event to the next trading day.</td></tr>
+              <tr><td>Mixed EPS definitions</td><td>Actuals from I/B/E/S on the Street basis, never Compustat GAAP EPS.</td></tr>
+              <tr><td>Restated fundamentals</td><td>Accruals only from filings dated before the event; restatements flagged.</td></tr>
+              <tr><td>Peer and industry look-ahead</td><td>Historical CRSP industry codes; a peer counts only if it reported before the event.</td></tr>
+              <tr><td>Tuning on the test years</td><td>Expanding-window walk-forward with hyperparameters tuned inside each training window; the final years stay untouched until the end.</td></tr>
+              <tr><td>Weak baselines</td><td>The model must beat last quarter's tercile, the revision sign, and a multinomial logit on the same features.</td></tr>
+              <tr><td>Live record</td><td>Each prediction hashed and pushed to GitHub before the announcement.</td></tr>
+            </tbody>
+          </table>
+        </details>
+      </article>
+      <div class="open-side">
+        <article class="card">
+          <p class="status">Needs data</p>
+          <h3>Two-year backtest of the live models</h3>
+          <p>The forward sample grows by a few trades a week, so reaching a full-validation sample live takes about 35 weeks. Two years of history would reach a comparable sample in 3–6 weeks of work.</p>
+          <ul>
+            <li>Order flow and volume profile from CME trade data with aggressor flags, with 16-tick bars rebuilt by the same rules as the live indicators.</li>
+            <li>Gamma maps rebuilt from ES and SPX option open interest as of each prior close.</li>
+            <li>Validation first: rebuilt maps must land within ±3 points of the ~25 maps frozen live, and rebuilt bars must match the logger.</li>
+          </ul>
+        </article>
+        <article class="card">
+          <p class="status">Design</p>
+          <h3>Scoring large aggressive prints</h3>
+          <p>A filter that rates each big-trade print by its follow-through relative to the effort behind it (volume, delta, book thickness, distance to gamma levels), to separate prints that move price from prints that get absorbed.</p>
+        </article>
+        <article class="card">
+          <p class="status">Running</p>
+          <h3>Forward tests on fixed rules</h3>
+          <ul>
+            <li>Model B setups: first review at 30 trades.</li>
+            <li>30-minute breakout with the gamma flip-room gate: evaluated at 176 forward sessions, rules fixed as of October 12, 2026.</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ METHOD ============ -->
+  <section class="sec" id="method" aria-labelledby="method-title">
+    <div class="sec-head">
+      <p class="eyebrow">Method</p>
+      <h2 id="method-title">How the work is done</h2>
+    </div>
+    <div class="principles">
+      <div><h3>Freeze the hypothesis first</h3><p>Rules, sample and pass criteria are written down and SHA-256 hashed before the outcome is computed. Anything decided after looking is labeled exploratory.</p></div>
+      <div><h3>Verify against raw prints</h3><p>Random trades are re-derived print by print from the raw tick data before results are reported: 24 of 24 in the breakout study, 25 of 25 in the setup backtest, 12 of 12 in the body-range variant.</p></div>
+      <div><h3>Count every look</h3><p>Bonferroni across rule families, deflated Sharpe for parameter grids, empirical-Bayes shrinkage across variants, and a minimum detectable effect for every null.</p></div>
+      <div><h3>Replicate independently</h3><p>The strongest test is someone else's data and someone else's code. The macro-release rule failed on its first independent replication.</p></div>
+      <div><h3>Publish the failures</h3><p>A record that only shows winners cannot be calibrated. Every study is listed here with its verdict.</p></div>
+      <div><h3>Tools</h3><p>Python (pandas, NumPy, SQLite), C# on .NET for the Quantower indicators, and Notion for the journal. Analysis code was written with AI assistance (Claude); every reported number traces to a script and raw data that can be re-run.</p></div>
+    </div>
+  </section>
+
+  <!-- ============ ABOUT ============ -->
+  <section class="sec" id="about" aria-labelledby="about-title">
+    <div class="sec-head">
+      <p class="eyebrow">About</p>
+      <h2 id="about-title">Nana Owusu</h2>
+    </div>
+    <div class="about">
+      <div>
+        <p>I was born in Ghana and study finance and business intelligence at Augustana College in Rock Island, Illinois. I trade the U.S. equity index open every morning and run that trading as a research program: each idea gets a test, a sample and a verdict.</p>
+        <p>Outside markets I co-founded Payday, an earned-wage-access fintech in Ghana, where I am CEO, and I run a small firm that does authorized security testing for client companies.</p>
+        <p>I am looking for a sales and trading internship, and for faculty collaborators on the earnings-surprise project.</p>
+      </div>
+      <dl class="facts" id="facts">
+        <dt>School</dt><dd>Augustana College · Finance, Business Intelligence · expected 2028</dd>
+        <dt>Markets</dt><dd>ES, MES and NQ futures; SPX and ES options positioning</dd>
+        <dt>Stack</dt><dd>Python, C#/.NET, SQL</dd>
+        <dt>Ventures</dt><dd>Payday (co-founder, CEO) · authorized security testing</dd>
+      </dl>
+    </div>
+  </section>
+
+  <footer>
+    <p>Research, not investment advice. Market data used in these studies is licensed from CQG, Databento, MenthorQ and WRDS and is not redistributed; the repositories hold code and derived statistics only.</p>
+    <p>© 2026 Nana Owusu</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  // Fill these in to switch on the GitHub, LinkedIn and email links across the page.
+  const SITE = { github: 'CSBROS', linkedin: '', email: '' };
+
+  const $ = (s, r) => (r || document).querySelector(s);
+  const el = (tag, attrs, kids) => {
+    const e = document.createElement(tag);
+    if (attrs) for (const k in attrs) {
+      if (k === 'text') e.textContent = attrs[k];
+      else if (k === 'cls') e.className = attrs[k];
+      else if (k === 'style') e.setAttribute('style', attrs[k]);
+      else e.setAttribute(k, attrs[k]);
+    }
+    if (kids) (Array.isArray(kids) ? kids : [kids]).forEach((c) => { if (c != null) e.append(c); });
+    return e;
+  };
+  const NS = 'http://www.w3.org/2000/svg';
+  const svgEl = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.append(e); return e; };
+  const reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const sgn = (x, d) => { const v = Math.abs(x) < 0.5 * Math.pow(10, -d) ? 0 : x; return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(d); };
+  const pct = (x, d) => (100 * x).toFixed(d == null ? 1 : d) + '%';
+  function seg(container, options, current, onChange) {
+    container.replaceChildren();
+    options.forEach((o) => {
+      const b = el('button', { type: 'button', 'aria-pressed': String(o.v === current), text: o.label });
+      b.addEventListener('click', () => { [...container.children].forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); onChange(o.v); });
+      container.append(b);
+    });
+  }
+
+  // ---------- html bar chart ----------
+  function hbar(box, o) {
+    const span = o.max - o.min, P = (v) => (Math.max(o.min, Math.min(o.max, v)) - o.min) / span * 100;
+    const z = P(Math.max(o.min, Math.min(o.max, 0)));
+    const g = el('div', { cls: 'hb' });
+    o.rows.forEach((r, i) => {
+      const row = 'grid-row:' + (i + 1) + ';grid-column:';
+      const lab = el('div', { cls: 'hb-lab', style: row + '1' }, [document.createTextNode(r.label), r.sub ? el('small', { text: r.sub }) : null]);
+      const tr = el('div', { cls: 'hb-track', style: row + '2', role: 'img', 'aria-label': r.label + ': ' + r.txt });
+      const a = P(r.v), left = Math.min(a, z), w = Math.abs(a - z);
+      tr.append(el('i', { cls: r.cls || '', style: 'left:' + left + '%;width:' + Math.max(w, 0.6) + '%' }));
+      if (r.mark != null) tr.append(el('b', { cls: 'mk', style: 'left:' + P(r.mark) + '%' }));
+      const val = el('div', { cls: 'hb-val', style: row + '3' }, [document.createTextNode(r.txt), r.small ? el('small', { text: r.small }) : null]);
+      g.append(lab, tr, val);
+    });
+    const over = el('div', { cls: 'hb-over', style: 'grid-row: 1 / span ' + o.rows.length });
+    if (o.min < 0 && o.max > 0) over.append(el('i', { cls: 'z', style: 'left:' + z + '%' }));
+    (o.refs || []).forEach((r) => over.append(el('i', { cls: 'r', style: 'left:' + P(r.v) + '%' })));
+    g.append(over);
+    const ax = el('div', { cls: 'hb-axis', style: 'grid-row: ' + (o.rows.length + 1) });
+    (o.ticks || []).forEach((t) => ax.append(el('span', { style: 'left:' + P(t) + '%', text: o.fmt ? o.fmt(t) : String(t) })));
+    g.append(ax);
+    box.replaceChildren(g);
+    const legend = [];
+    (o.refs || []).forEach((r) => { if (r.label) legend.push(el('span', null, [el('i'), document.createTextNode(r.label)])); });
+    if (o.markLabel) legend.push(el('span', null, [el('i', { cls: 'mk' }), document.createTextNode(o.markLabel)]));
+    if (legend.length) box.append(el('div', { cls: 'hb-legend' }, legend));
+  }
+
+  // ---------- normal + binomial helpers ----------
+  function erf(x) { const s = x < 0 ? -1 : 1; x = Math.abs(x); const t = 1 / (1 + 0.3275911 * x); const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x); return s * y; }
+  const Phi = (x) => 0.5 * (1 + erf(x / Math.SQRT2));
+  const phi = (x) => Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
+  function expMax(N) { if (N <= 1) return 0; let s = 0; const h = 0.01; for (let x = -6; x <= 8; x += h) s += x * N * phi(x) * Math.pow(Phi(x), N - 1) * h; return s; }
+  const LG = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+  function lgamma(x) { if (x < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * x)) - lgamma(1 - x); x -= 1; let a = LG[0]; const t = x + 7.5; for (let i = 1; i < 9; i++) a += LG[i] / (x + i); return 0.5 * Math.log(2 * Math.PI) + (x + 0.5) * Math.log(t) - t + Math.log(a); }
+  function binomQ(N, p, q) {
+    const lN = lgamma(N + 1), lp = Math.log(p), lq = Math.log(1 - p); let cum = 0;
+    for (let k = 0; k <= N; k++) { cum += Math.exp(lN - lgamma(k + 1) - lgamma(N - k + 1) + k * lp + (N - k) * lq); if (cum >= q - 1e-12) return k; }
+    return N;
+  }
+  function mulberry32(a) { return function () { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+
+  // =========================================================================================
+  // STUDIES
+  // =========================================================================================
+  const STUDIES = [
+    { id: 's-macro', group: 'fail', stamp: 'Falsified', cls: 'fail', area: 'Order flow · Macro releases', key: 't +1.63 → −1.47', repo: 'macro-release-orderflow',
+      title: 'A 10-second order-flow signal after macro releases',
+      q: 'Does the one-sidedness of aggressor volume in the first 10 seconds after a 07:30 CT release predict the next two minutes of ES?',
+      data: 'Every ES and MES trade with its aggressor flag from a CQG tick cache: 22 qualifying 07:30 releases, 2025–26. Independent replication by a collaborator, Limbø, on Databento MBP-1 quotes for every ES and NQ contract, January 2018 to October 2026.',
+      design: 'c10 = net aggressor volume ÷ total volume over 07:30:00–07:30:09, signed by the 10-second move. Follow if c10 ≥ 0.25, fade below; 10-point stop; exit at two minutes. Fills from real trade prints at 50 ms latency. The replication spec was frozen and hashed before it ran.',
+      results: ['In sample: +2.64 points per trade, annualized Sharpe 1.90, t = 1.63 (n = 22).', 'Parameter audit: the chosen cell ranked 37th of 560. Deflated Sharpe 0.05.', 'The same rule at the 08:45, 09:00 and 13:00 releases lost 0.96 points per trade (n = 29).', 'Independent replication on ES: −1.41 points per trade, t = −1.47 (n = 198). The signal’s rank correlation with the next two minutes fell to +0.04 (p = 0.56).'],
+      take: 'A Sharpe of 1.9 on 22 events, picked from 560 configurations, is what chance produces. The rule is retired.',
+      fig: figMacro },
+    { id: 's-orb', group: 'null', stamp: 'No edge', cls: '', area: 'Price action · Backtest', key: 'V1 −0.058R · V2 −0.138R', repo: 'orb-backtest',
+      title: 'Opening-range breakouts on ES',
+      q: 'Do the two most common opening-range breakout rules make money after costs?',
+      data: '174 regular sessions, June 2025 to October 2026, every CQG print aggregated to one-second bars. 24 of 24 randomly drawn trades re-derived print by print.',
+      design: 'V1: 15-minute range, stop beyond the signal candle, 0.5R target. V2: 30-minute range, stop at the opposite extreme, 1R target. One tick of slippage plus commission on Micro contracts.',
+      results: ['V1 wins 65.9% of trades and still loses 0.058R per trade (t = −1.05). A 0.5R target needs 66.7% to break even.', 'V2 loses 0.138R per trade (t = −2.11).', 'A search of 288 variants found no cell with t > 2; the best reached t = 0.94 (Bonferroni p = 1.00). Empirical-Bayes shrinkage pulls every cell to −0.083R.', 'Through a prop-firm lifecycle Monte Carlo, V1 failed 4 of 5 pre-registered criteria. Verdict: do not automate.'],
+      take: 'A win rate means nothing until it is set against the breakeven rate its reward-to-risk implies.',
+      fig: figOrb },
+    { id: 's-orbgex', group: 'null', stamp: 'Not supported', cls: '', area: 'Dealer gamma · Pre-registered', key: '0 of 8 tests survive', repo: 'orb-gex',
+      title: 'Does the dealer-gamma regime improve the breakout?',
+      q: 'When options dealers are short gamma, their hedging should amplify moves. Do breakouts pay more in negative gamma?',
+      data: '18 sessions with both a frozen pre-open gamma map and a complete tape.',
+      design: 'Four rules (regime gate, regime routing, flip-room gate, level-based target) applied to both breakout variants, written down and SHA-256 hashed before any conditioned outcome was computed.',
+      results: ['0 of 8 tests survive. Every Bonferroni p = 1.00; the best raw p was 0.24.', 'Breakouts did not pay more in negative gamma: V1 returned −0.036R per trade there (n = 6).', 'Minimum detectable effect: 0.2–1.0R per session. Confirming the most promising rule at its observed effect would take about 176 more sessions.'],
+      take: 'Every null result should state its minimum detectable effect, so it is clear how large an effect the data could have missed.',
+      fig: figOrbGex },
+    { id: 's-levels', group: 'null', stamp: 'Not supported', cls: '', area: 'Dealer gamma · Level reaction', key: '33.3% vs 36.4% random', repo: 'levels-backtest',
+      title: 'Do gamma-map levels hold?',
+      q: 'Do price levels from the daily dealer-gamma map reject price more often than arbitrary prices do?',
+      data: '204 touches of 50 graded levels across 16 sessions, against 1,444 touches of random off-grid prices and a 5-point grid.',
+      design: 'A hold is 8 points back before 4 points through; a random walk gives 33%. Six alternative definitions. Separately, all 55 tradeable setups were backtested with limit entries under the live risk rules.',
+      results: ['Map levels held 33.3% of the time and random prices 36.4%. Difference −3.0 points, 90% CI −11.6 to +6.1.', 'The grade did not sort levels (rank correlation +0.06).', 'Setup backtest: 25 fills, −0.134R per trade (t = −0.54).'],
+      take: 'The level alone carries no reaction edge in this sample. If an edge exists, it sits in the order flow at the level, which is what the current forward test measures.',
+      fig: figLevels },
+    { id: 's-absorb', group: 'mixed', stamp: 'Mixed', cls: 'open', area: 'Order flow · Pre-registered', key: 'flag vs ordinary bar t 3.7', repo: 'absorption-close-test',
+      title: 'Absorption prints into the close',
+      q: 'When a 16-tick bar closes against its own delta late in the session, does it call the next move?',
+      data: 'Pilot: 24 sessions of logged bars. Holdout: 129 clean sessions rebuilt from every trade in the tick cache.',
+      design: 'Pre-registered (SHA-256 a6a57461…). Pass bar t ≥ 2.5 at 5 to 60 minutes, with ordinary bars as a placebo.',
+      results: ['In the pilot, fading the 14:30–15:00 move worked on 71% of days (t = 2.72). In the holdout, t = 0.08.', 'Cause: the pilot read clock prices off range-bar closes that were up to an hour stale and sat at bar extremes, which builds in a reversal.', 'The flag does not call direction at any horizon. The last short flag even went the wrong way, driven by 2025.', 'What held: absorption bars beat ordinary bars by 1.38 points over 10 minutes (t = 3.7). Ordinary bars snap back; absorption bars do not.'],
+      take: 'The most expensive bug was in the timestamps, not the model.',
+      fig: figAbsorb },
+    { id: 's-gamma', group: 'desc', stamp: 'Descriptive', cls: 'desc', area: 'Dealer gamma · Volatility', key: 'first 15 min r 0.77', repo: 'gamma-vs-volatility',
+      title: 'Does the gamma board forecast the morning?',
+      q: 'Can the pre-open dealer-gamma board say how volatile the first two hours will be?',
+      data: '54 sessions of realized volatility, measured as 16-tick bars per hour from 08:30 to 10:15 CT; 19 sessions with a board call.',
+      design: 'Board classes from the saved maps and journal; correlation of early-session bar rates with the rest of the morning.',
+      results: ['Positive-gamma mornings printed a median 27 bars per hour, negative 39, and mornings where the SPX and ES books disagreed in sign 55.', 'The first 15 minutes predict the rest of the morning (r = 0.77). Overnight activity predicts it weakly (r = 0.40).', 'Negative gamma permits volatile mornings without causing them: three of four days when both books flipped negative were ordinary.'],
+      take: 'Use the board to set the possible range and the first 15 minutes to confirm it. With 19 board days, this is a hypothesis to test.',
+      fig: figGamma },
+    { id: 's-cpi', group: 'desc', stamp: 'Descriptive', cls: 'desc', area: 'Macro releases · Tape anatomy', key: 'first minute 10.7× normal', repo: 'cpi-ppi-tape',
+      title: 'What CPI and PPI releases do to the ES tape',
+      q: 'How large is the release shock, how fast does it decay, and what survives into the cash session?',
+      data: '15 measured releases (7 CPI, 8 PPI), April 2025 to September 2026, against 158 control sessions on the same contracts.',
+      design: 'Range and volume in fixed windows after 07:30 CT, each divided by the median of the control sessions.',
+      results: ['First-minute range: 10.7× normal. Every release exceeded the control 90th percentile.', 'By the cash session the day is ordinary: regular-hours range 1.02× normal.', 'At least one release-hour extreme went unrevisited all session on 73% of release days, against 33% of normal days.', 'Chasing the first-minute move until 08:29 won 4 times out of 15.'],
+      take: 'The shock decays within the hour. The release-hour extremes are what is worth carrying into the session.',
+      fig: figCpi },
+    { id: 's-prop', group: 'model', stamp: 'Model', cls: 'desc', area: 'Risk · Monte Carlo', key: 'zero-edge pass ≈ 28.7%', repo: 'prop-lifecycle',
+      title: 'What a prop-firm evaluation pays at zero edge',
+      q: 'How much of a funded-trader program’s payout comes from the trader, and how much from the structure of the account?',
+      data: 'Simulated accounts under published evaluation rules (target, trailing drawdown, payout schedule), checked against closed-form results.',
+      design: 'Monte Carlo of the full account lifecycle (evaluation, funding, payouts, breach) with a posterior-predictive edge and a weekly block bootstrap.',
+      results: ['At zero edge the pass rate is barrier geometry: P(pass) ≈ e^(−T/D) = 28.7% (simulated 29.0%), whatever the reward-to-risk.', 'Fifty lifecycles cannot rank strategies. A true 4.1× payout multiple has a 90% interval of 1.2×–7.7× over 50 attempts; resolving ±0.5× takes about 2,000.', 'About half of a popular playbook’s claimed 4.2× multiple comes from the firm underwriting the drawdown. Reproducing the rest needs +0.075 to +0.125R per trade of real edge.'],
+      take: 'Price the structure before crediting the trader.',
+      fig: figProp },
+  ];
+
+  // ---------- per-study figures ----------
+  function figMacro(box) {
+    const DATA = {
+      dec: { name: 'Decision time', base: '10 s', rows: [['5 s', -2.65], ['10 s', 1.87], ['15 s', 1.56], ['20 s', 0.02], ['30 s', -1.96]] },
+      cut: { name: 'Follow/fade cut-off', base: '0.25', rows: [['0.10', -1.45], ['0.15', 0.06], ['0.20', -0.03], ['0.25', 1.87], ['0.30', 2.06], ['0.35', 1.84], ['0.40', 0.42]] },
+      hor: { name: 'Holding time', base: '120 s', rows: [['60 s', 0.88], ['120 s', 1.87], ['180 s', 1.39], ['300 s', 2.37]] },
+    };
+    const ctl = el('div', { cls: 'fig-ctl' }, [el('span', { cls: 'lbl', text: 'Change one setting:' })]);
+    const sg = el('div', { cls: 'seg', role: 'group', 'aria-label': 'Parameter' }); ctl.append(sg);
+    const chart = el('div'), read = el('p', { cls: 'fig-read' });
+    const cap = el('p', { cls: 'fig-cap', text: 'In-sample points per trade when one setting moves and the others stay at the chosen cell (1-second data, all 07:30 releases, from the 560-cell grid). One step either way can erase the edge. The dashed line is what the rule made on eight years of independent data.' });
+    box.append(ctl, chart, read, cap);
+    function draw(k) {
+      const d = DATA[k];
+      hbar(chart, { min: -3, max: 3, ticks: [-3, -2, -1, 0, 1, 2, 3], fmt: (t) => sgn(t, 0),
+        rows: d.rows.map(([lab, v]) => ({ label: lab, sub: lab === d.base ? 'chosen cell' : '', v, txt: sgn(v, 2) + ' pts', cls: lab === d.base ? 'hi' : v < 0 ? 'neg' : '' })),
+        refs: [{ v: -1.41, label: 'Independent replication, ES: −1.41 pts/trade' }] });
+      const vals = d.rows.map((r) => r[1]);
+      read.textContent = d.name + ': ' + sgn(Math.min.apply(null, vals), 2) + ' to ' + sgn(Math.max.apply(null, vals), 2) + ' points per trade across ' + vals.length + ' settings.';
+    }
+    seg(sg, [{ v: 'dec', label: 'Decision time' }, { v: 'cut', label: 'Cut-off' }, { v: 'hor', label: 'Holding time' }], 'dec', draw);
+    draw('dec');
+  }
+
+  function figOrb(box) {
+    const F = [['No costs', 0.029], ['Commission only', -0.031], ['+1 tick slippage', -0.058], ['+2 ticks', -0.113], ['+3 ticks', -0.141]];
+    const ctl = el('div', { cls: 'ctl' });
+    const lab = el('label', { for: 'orb-fr' }, [el('span', { text: 'Friction on V1 (15-minute range, 0.5R target)' }), el('output', { id: 'orb-fr-out', for: 'orb-fr' })]);
+    const rng = el('input', { id: 'orb-fr', type: 'range', min: '0', max: '4', step: '1', value: '2' });
+    ctl.append(lab, rng);
+    const chart = el('div', { style: 'margin-top:16px' }), read = el('p', { cls: 'fig-read' });
+    const cap = el('p', { cls: 'fig-cap', text: 'Expectancy per trade in R across 173 sessions. The rule wins two trades in three, which is exactly what a 0.5R target needs to break even, so a single tick of friction decides the sign. Base case is +1 tick (t = −1.05). V2 loses 0.092R before costs and 0.138R after.' });
+    box.append(ctl, chart, read, cap);
+    function draw() {
+      const i = +rng.value; $('#orb-fr-out', box).textContent = F[i][0];
+      hbar(chart, { min: -0.16, max: 0.06, ticks: [-0.15, -0.1, -0.05, 0, 0.05], fmt: (t) => sgn(t, 2),
+        rows: F.map(([l, v], j) => ({ label: l, v, txt: sgn(v, 3) + 'R', cls: j === i ? 'hi' : v < 0 ? 'neg' : 'pos' })) });
+      read.textContent = 'V1 at ' + F[i][0].toLowerCase() + ': ' + sgn(F[i][1], 3) + 'R per trade · on $300 of risk ≈ ' + (F[i][1] < 0 ? '−$' : '+$') + Math.abs(F[i][1] * 300).toFixed(0) + ' per trade';
+    }
+    rng.addEventListener('input', draw); draw();
+  }
+
+  function figOrbGex(box) {
+    const D = {
+      V1: [['G1 regime gate', -0.058, 0.44, 0.58], ['G2 regime routing', -0.260, 0.79, 0.86], ['G3 flip-room gate', 0.032, 0.22, 0.31], ['G4 level target', 0.068, 0.82, 0.39]],
+      V2: [['G1 regime gate', 0.108, 0.58, 0.48], ['G2 regime routing', 0.129, 1.01, 0.32], ['G3 flip-room gate', 0.120, 0.37, 0.24], ['G4 level target', -0.140, 0.39, 0.89]],
+    };
+    const ctl = el('div', { cls: 'fig-ctl' }, [el('span', { cls: 'lbl', text: 'Breakout variant:' })]);
+    const sg = el('div', { cls: 'seg', role: 'group', 'aria-label': 'Variant' }); ctl.append(sg);
+    const chart = el('div'), cap = el('p', { cls: 'fig-cap', text: 'Change in R per session from each pre-registered rule. The black tick is the smallest change 18 sessions could detect (α = 0.05/8, power 0.80). Every observed change sits well inside it.' });
+    box.append(ctl, chart, cap);
+    function draw(k) {
+      hbar(chart, { min: -0.4, max: 1.1, ticks: [-0.4, 0, 0.4, 0.8], fmt: (t) => sgn(t, 1), markLabel: 'minimum detectable change',
+        rows: D[k].map(([l, v, mdd, p]) => ({ label: l, v, mark: mdd, txt: sgn(v, 3) + 'R', small: 'p ' + p.toFixed(2), cls: v < 0 ? 'neg' : 'hi' })) });
+    }
+    seg(sg, [{ v: 'V1', label: 'V1 · 15-minute' }, { v: 'V2', label: 'V2 · 30-minute' }], 'V1', draw);
+    draw('V1');
+  }
+
+  function figLevels(box) {
+    const D = {
+      all: { rows: [['Map levels', 0.333, 'hi', '68 of 204 touches'], ['Random prices', 0.364, '', '525 of 1,444'], ['5-point grid', 0.358, '', '']], note: 'Difference −3.0 points, 90% CI −11.6 to +6.1. Same picture under all six hold definitions.' },
+      pos: { rows: [['Map levels', 0.312, 'hi', ''], ['Random prices', 0.328, '', '']], note: 'Positive-gamma sessions, where levels should hold best: map levels still trail random prices.' },
+      neg: { rows: [['Map levels', 0.381, 'hi', ''], ['Random prices', 0.364, '', '']], note: 'Negative-gamma sessions: a 1.7-point gap, far inside the noise of this sample.' },
+    };
+    const ctl = el('div', { cls: 'fig-ctl' }, [el('span', { cls: 'lbl', text: 'Sessions:' })]);
+    const sg = el('div', { cls: 'seg', role: 'group', 'aria-label': 'Regime' }); ctl.append(sg);
+    const chart = el('div'), read = el('p', { cls: 'fig-read' });
+    const cap = el('p', { cls: 'fig-cap', text: 'Share of touches that held: 8 points back before 4 points through. The dashed line is the random-walk expectation.' });
+    box.append(ctl, chart, read, cap);
+    function draw(k) {
+      hbar(chart, { min: 0, max: 0.5, ticks: [0, 0.1, 0.2, 0.3, 0.4, 0.5], fmt: (t) => pct(t, 0),
+        rows: D[k].rows.map(([l, v, c, s]) => ({ label: l, sub: s, v, txt: pct(v), cls: c })), refs: [{ v: 0.333, label: 'random-walk expectation, 33%' }] });
+      read.textContent = D[k].note;
+    }
+    seg(sg, [{ v: 'all', label: 'All' }, { v: 'pos', label: 'Positive gamma' }, { v: 'neg', label: 'Negative gamma' }], 'all', draw);
+    draw('all');
+  }
+
+  function figAbsorb(box) {
+    const H = [5, 10, 15, 30, 60];
+    const S = [
+      ['Last flag of the day', [[56, 0.67, 1.2], [54, 0.53, 0.8], [54, 0.34, 0.5], [56, 0.44, 0.6], [57, 0.74, 0.8]]],
+      ['Last long flag', [[62, 1.53, 2.7], [62, 1.09, 1.5], [58, 1.02, 1.2], [58, 0.92, 1.0], [58, 1.00, 0.9]]],
+      ['Last short flag', [[41, -1.50, -2.6], [34, -2.27, -3.3], [37, -2.93, -3.4], [41, -2.75, -2.9], [41, -2.88, -2.6]]],
+      ['Ordinary bars (placebo)', [[48, -0.35, -2.8], [47, -0.68, -4.2], [48, -0.72, -3.5], [47, -0.41, -1.6], [47, -0.49, -1.9]]],
+      ['Flag minus placebo', [[null, 0.90, 3.1], [null, 1.38, 3.7], [null, 1.30, 2.9], [null, 0.87, 1.5], [null, 0.98, 1.6]]],
+    ];
+    const ctl = el('div', { cls: 'fig-ctl' }, [el('span', { cls: 'lbl', text: 'Minutes after the flag:' })]);
+    const sg = el('div', { cls: 'seg', role: 'group', 'aria-label': 'Horizon' }); ctl.append(sg);
+    const chart = el('div'), cap = el('p', { cls: 'fig-cap', text: 'Pre-registered holdout, 129 sessions. Bars show the t-statistic; the dashed lines mark the ±2.5 pass bar. Direction signals pass only where one year carries them. The flag-minus-placebo gap is the effect that held: ordinary bars snap back, absorption bars do not.' });
+    box.append(ctl, chart, cap);
+    function draw(h) {
+      const i = H.indexOf(h);
+      hbar(chart, { min: -4.5, max: 4.5, ticks: [-4, -2, 0, 2, 4], fmt: (t) => sgn(t, 0),
+        rows: S.map(([l, arr]) => { const [hit, pts, t] = arr[i]; return { label: l, v: t, txt: 't ' + sgn(t, 1), small: (hit != null ? hit + '% · ' : '') + sgn(pts, 2) + ' pts', cls: l === 'Flag minus placebo' ? (Math.abs(t) >= 2.5 ? 'pos' : 'hi') : (t < 0 ? 'neg' : '') }; }),
+        refs: [{ v: -2.5, label: 'pass bar |t| ≥ 2.5' }, { v: 2.5, label: '' }] });
+    }
+    seg(sg, H.map((h) => ({ v: h, label: h + ' min' })), 10, draw);
+    draw(10);
+  }
+
+  function figGamma(box) {
+    const D = {
+      board: [['Positive gamma', 27, 'n 7', 'hi'], ['Negative gamma', 39, 'n 7', ''], ['Books disagree', 55, 'n 5', '']],
+      flip: [['SPX sign flipped', 38, 'n 6', 'hi'], ['No flip', 50, 'n 7', '']],
+    };
+    const ctl = el('div', { cls: 'fig-ctl' }, [el('span', { cls: 'lbl', text: 'Group sessions by:' })]);
+    const sg = el('div', { cls: 'seg', role: 'group', 'aria-label': 'Grouping' }); ctl.append(sg);
+    const chart = el('div');
+    const kpis = el('div', { cls: 'kpis' }, [
+      el('div', { cls: 'kpi' }, [el('b', { text: 'r 0.77' }), el('span', { text: 'first 15 minutes vs rest of morning' })]),
+      el('div', { cls: 'kpi' }, [el('b', { text: 'r 0.40' }), el('span', { text: 'overnight vs morning' })]),
+    ]);
+    const cap = el('p', { cls: 'fig-cap', text: 'Median 16-tick bars per hour, 08:30–10:15 CT. The dashed line is the 54-session median (43). A sign flip alone did not mark a busy morning.' });
+    box.append(ctl, chart, kpis, cap);
+    function draw(k) { hbar(chart, { min: 0, max: 60, ticks: [0, 15, 30, 45, 60], rows: D[k].map(([l, v, s, c]) => ({ label: l, sub: s, v, txt: v + ' /hr', cls: c })), refs: [{ v: 43, label: 'all-session median, 43 bars/hr' }] }); }
+    seg(sg, [{ v: 'board', label: 'Board class' }, { v: 'flip', label: 'Sign flip' }], 'board', draw);
+    draw('board');
+  }
+
+  function figCpi(box) {
+    const D = {
+      range: [['First minute', 10.7], ['07:30–08:29', 2.7], ['Initial balance', 1.19], ['Regular hours', 1.02], ['09:15–14:45', 0.93]],
+      vol: [['First minute', 13.4], ['First 5 minutes', 7.4], ['07:30–08:29', 2.05], ['Regular hours', 1.04]],
+    };
+    const ctl = el('div', { cls: 'fig-ctl' }, [el('span', { cls: 'lbl', text: 'Measure:' })]);
+    const sg = el('div', { cls: 'seg', role: 'group', 'aria-label': 'Measure' }); ctl.append(sg);
+    const chart = el('div');
+    const tbl = el('table', { cls: 'mini-table' }, [
+      el('thead', null, el('tr', null, [el('th', { text: '' }), el('th', { text: 'CPI' }), el('th', { text: 'PPI' })])),
+      el('tbody', null, [
+        el('tr', null, [el('td', { text: 'First-minute move (median)' }), el('td', { cls: 'n', text: '20.75 pts' }), el('td', { cls: 'n', text: '5.75 pts' })]),
+        el('tr', null, [el('td', { text: 'Minute of the hour extreme (median)' }), el('td', { cls: 'n', text: '1' }), el('td', { cls: 'n', text: '14' })]),
+        el('tr', null, [el('td', { text: 'First-minute volume vs normal' }), el('td', { cls: 'n', text: '15.1×' }), el('td', { cls: 'n', text: '5.3×' })]),
+      ]),
+    ]);
+    const cap = el('p', { cls: 'fig-cap', text: 'Median release session divided by the median control session; the dashed line is a normal day. CPI hits instantly; PPI builds over the hour.' });
+    box.append(ctl, chart, cap, tbl);
+    function draw(k) { hbar(chart, { min: 0, max: 14, ticks: [0, 2, 4, 6, 8, 10, 12, 14], fmt: (t) => t + '×', rows: D[k].map(([l, v], j) => ({ label: l, v, txt: v + '×', cls: j === 0 ? 'hi' : '' })), refs: [{ v: 1, label: 'normal day, 1×' }] }); }
+    seg(sg, [{ v: 'range', label: 'Price range' }, { v: 'vol', label: 'Volume' }], 'range', draw);
+    draw('range');
+  }
+
+  function figProp(box) {
+    const NS_ = [10, 20, 50, 100, 200, 500, 1000, 2000];
+    const st = { T: 1250, D: 1000, type: 'trail', ni: 2 };
+    const ctl = el('div', { cls: 'fig-ctl' }, [el('span', { cls: 'lbl', text: 'Drawdown rule:' })]);
+    const sg = el('div', { cls: 'seg', role: 'group', 'aria-label': 'Drawdown rule' }); ctl.append(sg);
+    const presets = el('div', { cls: 'chips', style: 'margin-left:auto' });
+    [['$1,250 / $1,000', 1250, 1000], ['$1,500 / $1,500', 1500, 1500], ['$3,000 / $2,000', 3000, 2000]].forEach(([l, T, D]) => {
+      const b = el('button', { type: 'button', cls: 'chip', text: l, 'aria-pressed': 'false' });
+      b.addEventListener('click', () => { st.T = T; st.D = D; rT.value = T; rD.value = D; draw(); });
+      presets.append(b);
+    });
+    ctl.append(presets);
+    const mk = (id, label, min, max, step, val) => {
+      const c = el('div', { cls: 'ctl' }); const o = el('output', { id: id + '-out', for: id });
+      c.append(el('label', { for: id }, [el('span', { text: label }), o]), el('input', { id, type: 'range', min: String(min), max: String(max), step: String(step), value: String(val) }));
+      return c;
+    };
+    const grid = el('div', { cls: 'prop-grid' }, [mk('pp-T', 'Profit target', 250, 10000, 250, st.T), mk('pp-D', 'Drawdown allowance', 250, 5000, 250, st.D), mk('pp-N', 'Evaluations attempted', 0, 7, 1, st.ni)]);
+    const read = el('div', { cls: 'readout', style: 'margin-top:16px' });
+    const strip = el('div', { cls: 'strip' }), sax = el('div', { cls: 'strip-axis' });
+    [0, 25, 50, 75, 100].forEach((v) => sax.append(el('span', { style: 'left:' + v + '%', text: v + '%' })));
+    const cap = el('p', { cls: 'fig-cap', text: 'With no edge, a trader’s balance is a driftless walk, so the chance of reaching the target before the drawdown is set by the two barriers alone: e^(−T/D) when the drawdown trails the peak, D/(T+D) when it is static. The band is the 90% range of the pass rate you would observe over that many attempts.' });
+    box.append(ctl, grid, read, strip, sax, cap);
+    const rT = $('#pp-T', box), rD = $('#pp-D', box), rN = $('#pp-N', box);
+    function draw() {
+      st.T = +rT.value; st.D = +rD.value; st.ni = +rN.value; const N = NS_[st.ni];
+      $('#pp-T-out', box).textContent = '$' + st.T.toLocaleString('en-US');
+      $('#pp-D-out', box).textContent = '$' + st.D.toLocaleString('en-US');
+      $('#pp-N-out', box).textContent = N.toLocaleString('en-US');
+      const p = st.type === 'trail' ? Math.exp(-st.T / st.D) : st.D / (st.T + st.D);
+      const lo = binomQ(N, p, 0.05) / N, hi = binomQ(N, p, 0.95) / N;
+      read.replaceChildren(el('span', { cls: 'big', text: pct(p) + ' pass with no edge' }), document.createTextNode('Over ' + N.toLocaleString('en-US') + ' attempts, a coin-flip trader shows anywhere from ' + pct(lo) + ' to ' + pct(hi) + ' (90% range).'));
+      strip.replaceChildren(el('i', { style: 'left:' + (100 * lo) + '%;width:' + Math.max(0.5, 100 * (hi - lo)) + '%' }), el('b', { style: 'left:' + (100 * p) + '%' }));
+      [...presets.children].forEach((b, j) => { const v = [[1250, 1000], [1500, 1500], [3000, 2000]][j]; b.setAttribute('aria-pressed', String(v[0] === st.T && v[1] === st.D)); });
+    }
+    seg(sg, [{ v: 'trail', label: 'Trailing' }, { v: 'static', label: 'Static' }], 'trail', (v) => { st.type = v; draw(); });
+    [rT, rD, rN].forEach((r) => r.addEventListener('input', draw));
+    draw();
+  }
+
+  // =========================================================================================
+  // FOREST PLOT
+  // =========================================================================================
+  const FOREST = [
+    { id: 's-macro', label: 'Macro-release order-flow rule', sub: 'ES 07:30 CT releases · n 22 → 198 on independent data', ins: 1.63, out: -1.47, c: 'fail', tag: 'Falsified' },
+    { id: 's-absorb', label: 'Fade the 14:30–15:00 move', sub: 'ES into the cash close · n 24 → 126', ins: 2.72, out: 0.08, c: 'fail', tag: 'Failed holdout' },
+    { id: 's-absorb', label: 'Absorption bar vs ordinary bar', sub: 'Next 10 min · pre-registered holdout · 129 sessions', out: 3.7, c: 'pass', tag: 'Held' },
+    { id: 's-absorb', label: 'Last absorption flag calls direction', sub: 'Next 10 min · pre-registered holdout · 129 sessions', out: 0.8, c: 'null', tag: 'No edge' },
+    { id: 's-orb', label: 'Opening-range breakout, 15-minute', sub: 'ES, net of costs · n 173', out: -1.05, c: 'null', tag: 'No edge' },
+    { id: 's-orb', label: 'Opening-range breakout, 30-minute', sub: 'ES, net of costs · n 174', out: -2.11, c: 'fail', tag: 'Loses' },
+    { id: 's-orb', label: 'Best of 288 breakout variants', sub: 'Short-only, 3R target · Bonferroni p 1.00 · n 88', out: 0.94, c: 'null', tag: 'No edge' },
+    { id: 's-levels', label: 'Gamma-map setups, limit entries', sub: 'All 55 tradeable setups, live risk rules · n 25 fills', out: -0.54, c: 'null', tag: 'No edge' },
+  ];
+  const X = (t) => (Math.max(-4, Math.min(4, t)) + 4) / 8;
+  const L = (f) => 'calc(6px + (100% - 12px) * ' + f.toFixed(5) + ')';
+  const W = (f) => 'calc((100% - 12px) * ' + f.toFixed(5) + ')';
+  const forestRows = $('#forest-rows'), forestFig = $('#forest');
+  let forestMode = 'out';
+  const rowEls = FOREST.map((r) => {
+    const b = el('button', { type: 'button', cls: 'frow', style: '--c: var(--' + r.c + ')', 'aria-label': r.label + ', ' + r.tag + '. Open study.' });
+    const lab = el('span', { cls: 'lab' }, [el('b', { text: r.label }), el('span', { text: r.sub })]);
+    const tr = el('span', { cls: 'track' }, [el('i', { cls: 'band' }), el('i', { cls: 'zero' })]);
+    const lnk = r.ins != null ? el('i', { cls: 'lnk' }) : null; if (lnk) tr.append(lnk);
+    const hol = r.ins != null ? el('i', { cls: 'dot hollow' }) : null; if (hol) tr.append(hol);
+    const dot = el('i', { cls: 'dot' }); tr.append(dot);
+    const val = el('span', { cls: 'vals' });
+    b.append(lab, tr, val);
+    b.addEventListener('click', () => { select(r.id, true); });
+    forestRows.append(b);
+    return { r, b, lnk, hol, dot, val };
+  });
+  function placeForest() {
+    rowEls.forEach(({ r, b, lnk, hol, dot, val }) => {
+      const showIns = forestMode === 'ins' && r.ins != null;
+      const cur = showIns ? r.ins : r.out;
+      dot.style.left = L(X(cur));
+      if (hol) { hol.style.left = L(X(r.ins)); hol.style.opacity = showIns ? '0' : '1'; }
+      if (lnk) { const a = X(r.ins), z = X(cur); lnk.style.left = L(Math.min(a, z)); lnk.style.width = W(Math.abs(a - z)); }
+      b.classList.toggle('dim', forestMode === 'ins' && r.ins == null);
+      val.replaceChildren();
+      if (forestMode === 'ins') {
+        val.append(document.createTextNode(r.ins != null ? sgn(r.ins, 2) : 'no pilot'), el('em', { text: r.ins != null ? 'First estimate' : 'Full sample only' }));
+      } else {
+        if (r.ins != null) val.append(el('span', { style: 'color:var(--muted)', text: sgn(r.ins, 2) + ' → ' }));
+        val.append(document.createTextNode(sgn(r.out, 2)), el('em', { text: r.tag }));
+      }
+    });
+    $('#forest-note').textContent = forestMode === 'ins'
+      ? 'This is how the two ideas with a pilot looked before they met new data. Both sat at or near |t| = 2. Rows without a pilot are dimmed. Click a row to open the study.'
+      : 'Shaded band: |t| < 2. Two ideas that looked real collapsed on data they had never seen. The one result past |t| = 2 is structural: absorption bars reverse less than ordinary bars, which says nothing about direction. Click a row to open the study.';
+  }
+  const modeSeg = $('#forest-mode');
+  function setMode(m) { forestMode = m; [...modeSeg.children].forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.mode === m))); placeForest(); }
+  modeSeg.addEventListener('click', (e) => { const b = e.target.closest('button[data-mode]'); if (b) { forestFig.classList.add('anim'); setMode(b.dataset.mode); } });
+  let replayTimer = null;
+  $('#forest-replay').addEventListener('click', () => {
+    clearTimeout(replayTimer);
+    forestFig.classList.remove('anim'); setMode('ins');
+    void forestFig.offsetWidth;
+    forestFig.classList.add('anim');
+    replayTimer = setTimeout(() => setMode('out'), reduce ? 0 : 900);
+  });
+  placeForest();
+
+  // =========================================================================================
+  // EXPLORER
+  // =========================================================================================
+  const GROUPS = [['all', 'All'], ['fail', 'Falsified'], ['null', 'No edge'], ['mixed', 'Mixed'], ['desc', 'Descriptive'], ['model', 'Model']];
+  let filter = 'all', current = null;
+  const chips = $('#chips'), slist = $('#slist'), detail = $('#sdetail');
+  GROUPS.forEach(([g, l]) => {
+    const n = g === 'all' ? STUDIES.length : STUDIES.filter((s) => s.group === g).length;
+    const b = el('button', { type: 'button', cls: 'chip', 'aria-pressed': String(g === 'all') }, [document.createTextNode(l), el('span', { text: String(n) })]);
+    b.addEventListener('click', () => { filter = g; [...chips.children].forEach((x) => x.setAttribute('aria-pressed', 'false')); b.setAttribute('aria-pressed', 'true'); renderList(); });
+    chips.append(b);
+  });
+  function renderList() {
+    slist.replaceChildren();
+    const vis = STUDIES.filter((s) => filter === 'all' || s.group === filter);
+    vis.forEach((s) => {
+      const b = el('button', { type: 'button', cls: 'sitem', role: 'option', 'aria-selected': String(current === s.id), 'data-id': s.id }, [
+        el('span', { cls: 'stamp ' + s.cls, text: s.stamp }), el('span', { cls: 't', text: s.title }), el('span', { cls: 'k', text: s.key })]);
+      b.addEventListener('click', () => select(s.id, false));
+      slist.append(b);
+    });
+    $('#count').textContent = vis.length + ' of ' + STUDIES.length + ' studies';
+    if (!vis.some((s) => s.id === current) && vis.length) select(vis[0].id, false, true);
+  }
+  function select(id, scroll, quiet) {
+    const s = STUDIES.find((x) => x.id === id); if (!s) return;
+    if (filter !== 'all' && s.group !== filter) { filter = 'all'; [...chips.children].forEach((x, j) => x.setAttribute('aria-pressed', String(j === 0))); current = id; renderList(); }
+    current = id;
+    [...slist.children].forEach((b) => b.setAttribute('aria-selected', String(b.dataset.id === id)));
+    renderDetail(s);
+    if (!quiet) { try { history.replaceState(null, '', '#' + id); } catch (e) { /* history unavailable */ } }
+    if (scroll) $('#research').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+  }
+  function renderDetail(s) {
+    const fig = el('div', { cls: 'fig' });
+    const dl = el('dl', null, [
+      el('dt', { text: 'Data' }), el('dd', { text: s.data }),
+      el('dt', { text: 'Design' }), el('dd', { text: s.design }),
+      el('dt', { text: 'Result' }), el('dd', null, el('ul', null, s.results.map((t) => el('li', { text: t })))),
+      el('dt', { text: 'Takeaway' }), el('dd', { cls: 'take', text: s.take }),
+    ]);
+    const code = el('a', { cls: 'code-link', hidden: '' , text: 'Code and write-up →' });
+    if (SITE.github) { code.href = 'https://github.com/' + SITE.github + '/research/tree/main/' + s.repo; code.target = '_blank'; code.rel = 'noopener'; code.hidden = false; }
+    detail.replaceChildren(
+      el('div', { cls: 'meta' }, [el('span', { cls: 'stamp ' + s.cls, text: s.stamp }), el('span', { cls: 'area', text: s.area })]),
+      el('h3', { text: s.title }), el('p', { cls: 'q', text: s.q }), fig, dl, code);
+    s.fig(fig);
+  }
+  const initial = (location.hash || '').slice(1);
+  current = STUDIES.some((s) => s.id === initial) ? initial : STUDIES[0].id;
+  renderList(); select(current, false, true);
+
+  // =========================================================================================
+  // LAB 1: BREAKEVEN FRONTIER
+  // =========================================================================================
+  const fr = { b: 2.5, p: 0.36, c: 0 };
+  const FR_PTS = [{ b: 0.5, p: 0.659, l: 'V1 · 15-min, 0.5R' }, { b: 1, p: 0.532, l: '15-min, 1R target' }, { b: 1, p: 0.425, l: 'V2 · 30-min, 1R' }];
+  const frBox = $('#frontier'); let frGeom = null;
+  function drawFrontier() {
+    const Wd = Math.max(280, frBox.clientWidth || 600), Hd = Math.round(Math.max(280, Math.min(420, Wd * 0.62)));
+    const m = { l: 44, r: 16, t: 14, b: 36 }, lb0 = Math.log(0.25), lb1 = Math.log(4);
+    const x = (b) => m.l + (Math.log(b) - lb0) / (lb1 - lb0) * (Wd - m.l - m.r);
+    const y = (p) => m.t + (1 - p) * (Hd - m.t - m.b);
+    frGeom = { Wd, Hd, m, lb0, lb1, x, y };
+    frBox.replaceChildren();
+    const svg = svgEl('svg', { viewBox: '0 0 ' + Wd + ' ' + Hd, height: Hd, tabindex: '0', role: 'img', 'aria-label': 'Breakeven win rate by reward-to-risk. Use arrow keys to move your strategy.' }, frBox);
+    [0, 0.25, 0.5, 0.75, 1].forEach((p) => { svgEl('line', { x1: m.l, x2: Wd - m.r, y1: y(p), y2: y(p), stroke: 'var(--rule)', 'stroke-width': 1 }, svg); const t = svgEl('text', { x: m.l - 8, y: y(p), dy: '0.32em', 'text-anchor': 'end' }, svg); t.textContent = (100 * p) + '%'; });
+    [[0.25, '1:0.25'], [0.5, '1:0.5'], [1, '1:1'], [2, '1:2'], [4, '1:4']].forEach(([b, l]) => { svgEl('line', { x1: x(b), x2: x(b), y1: m.t, y2: Hd - m.b, stroke: 'var(--rule)', 'stroke-width': 1 }, svg); const t = svgEl('text', { x: x(b), y: Hd - 12, 'text-anchor': b === 0.25 ? 'start' : b === 4 ? 'end' : 'middle' }, svg); t.textContent = l; });
+    const pts = []; for (let i = 0; i <= 80; i++) { const b = Math.exp(lb0 + (lb1 - lb0) * i / 80); pts.push([x(b), y(Math.min(1, (1 + fr.c) / (1 + b)))]); }
+    svgEl('path', { d: 'M' + pts.map((q) => q[0].toFixed(1) + ',' + q[1].toFixed(1)).join('L') + 'L' + x(4) + ',' + y(1) + 'L' + x(0.25) + ',' + y(1) + 'Z', fill: 'var(--region)', stroke: 'none' }, svg);
+    svgEl('path', { d: 'M' + pts.map((q) => q[0].toFixed(1) + ',' + q[1].toFixed(1)).join('L'), fill: 'none', stroke: 'var(--ink)', 'stroke-width': 2 }, svg);
+    const tl = svgEl('text', { x: x(3.4), y: y(Math.min(1, (1 + fr.c) / 4.4)) + 18, class: 'lbl', 'text-anchor': 'middle' }, svg); tl.textContent = 'breakeven';
+    const t2 = svgEl('text', { x: x(2.6), y: y(0.9), class: 'lbl', 'text-anchor': 'middle' }, svg); t2.textContent = 'profitable';
+    FR_PTS.forEach((q, i) => {
+      svgEl('circle', { cx: x(q.b), cy: y(q.p), r: 5, fill: 'var(--null)', stroke: 'var(--surface)', 'stroke-width': 1.5 }, svg);
+      const t = svgEl('text', { x: x(q.b) + 9, y: y(q.p) + (i === 1 ? -6 : 4), class: 'lbl' }, svg); t.textContent = q.l + ' · ' + pct(q.p);
+    });
+    svgEl('circle', { cx: x(fr.b), cy: y(fr.p), r: 12, fill: 'var(--sel)', stroke: 'none' }, svg);
+    svgEl('circle', { cx: x(fr.b), cy: y(fr.p), r: 6.5, fill: 'var(--accent)', stroke: 'var(--surface)', 'stroke-width': 2 }, svg);
+    const yt = svgEl('text', { x: x(fr.b) + (x(fr.b) > Wd - 90 ? -14 : 14), y: y(fr.p) - 10, class: 'you', 'text-anchor': x(fr.b) > Wd - 90 ? 'end' : 'start' }, svg); yt.textContent = 'you';
+    const setFrom = (ev) => {
+      const r = svg.getBoundingClientRect(), sx = Wd / r.width, px = (ev.clientX - r.left) * sx, py = (ev.clientY - r.top) * sx;
+      const b = Math.exp(lb0 + (px - m.l) / (Wd - m.l - m.r) * (lb1 - lb0)), p = 1 - (py - m.t) / (Hd - m.t - m.b);
+      fr.b = Math.max(0.25, Math.min(4, b)); fr.p = Math.max(0.01, Math.min(0.99, p)); drawFrontier();
+    };
+    svg.addEventListener('pointerdown', (ev) => { ev.preventDefault(); frDragging = true; setFrom(ev); });
+    svg.addEventListener('keydown', (ev) => {
+      const k = ev.key; let used = true;
+      if (k === 'ArrowUp') fr.p = Math.min(0.99, fr.p + 0.01); else if (k === 'ArrowDown') fr.p = Math.max(0.01, fr.p - 0.01);
+      else if (k === 'ArrowRight') fr.b = Math.min(4, fr.b * 1.05); else if (k === 'ArrowLeft') fr.b = Math.max(0.25, fr.b / 1.05); else used = false;
+      if (used) { ev.preventDefault(); drawFrontier(); frBox.querySelector('svg').focus(); }
+    });
+    readFrontier();
+  }
+  let frDragging = false;
+  window.addEventListener('pointermove', (ev) => {
+    if (!frDragging || !frGeom) return;
+    const svg = frBox.querySelector('svg'); if (!svg) return;
+    const { Wd, Hd, m, lb0, lb1 } = frGeom, r = svg.getBoundingClientRect(), sx = Wd / r.width;
+    const px = (ev.clientX - r.left) * sx, py = (ev.clientY - r.top) * sx;
+    fr.b = Math.max(0.25, Math.min(4, Math.exp(lb0 + (px - m.l) / (Wd - m.l - m.r) * (lb1 - lb0))));
+    fr.p = Math.max(0.01, Math.min(0.99, 1 - (py - m.t) / (Hd - m.t - m.b)));
+    drawFrontier();
+  });
+  window.addEventListener('pointerup', () => { frDragging = false; });
+  function readFrontier() {
+    const e = fr.p * fr.b - (1 - fr.p) - fr.c, be = (1 + fr.c) / (1 + fr.b), mg = fr.p - be;
+    const R = $('#fr-read'); R.replaceChildren(
+      el('span', { cls: 'big ' + (e > 0.0005 ? 'pos' : e < -0.0005 ? 'neg' : ''), text: sgn(e, 3) + 'R per trade' }),
+      document.createTextNode(pct(fr.p) + ' win rate at 1:' + fr.b.toFixed(2)), el('br'),
+      document.createTextNode('breakeven ' + pct(be) + ' · margin ' + sgn(100 * mg, 1) + ' pts'), el('br'),
+      document.createTextNode('100 trades ≈ ' + sgn(100 * e, 1) + 'R'));
+  }
+  const frCost = $('#fr-cost');
+  frCost.addEventListener('input', () => { fr.c = +frCost.value; $('#fr-cost-out').textContent = fr.c.toFixed(2) + 'R'; drawFrontier(); });
+
+  // =========================================================================================
+  // LAB 2: MULTIPLE TESTING
+  // =========================================================================================
+  const MT_N = [1, 5, 20, 50, 100, 288, 560, 1000];
+  const mtBox = $('#mt-plot'), mtRange = $('#mt-n');
+  let mtSeed = 20261021, mtT = [], mtExp = {};
+  function mtSim() {
+    const N = MT_N[+mtRange.value], rnd = mulberry32(mtSeed + N * 7919); mtT = [];
+    for (let i = 0; i < N; i++) { let u = 0, v = 0; while (u === 0) u = rnd(); v = rnd(); mtT.push(Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v)); }
+    if (mtExp[N] == null) mtExp[N] = expMax(N);
+    drawMt();
+  }
+  function drawMt() {
+    const N = MT_N[+mtRange.value];
+    $('#mt-n-out').textContent = N.toLocaleString('en-US');
+    const Wd = Math.max(280, mtBox.clientWidth || 600), Hd = Math.round(Math.max(240, Math.min(360, Wd * 0.5)));
+    const m = { l: 40, r: 14, t: 22, b: 34 }, lo = -4, hi = 4, step = 0.25, nb = Math.round((hi - lo) / step);
+    const bins = new Array(nb).fill(0); mtT.forEach((t) => { const i = Math.max(0, Math.min(nb - 1, Math.floor((t - lo) / step))); bins[i]++; });
+    const ymax = Math.max(1, Math.max.apply(null, bins));
+    const x = (t) => m.l + (t - lo) / (hi - lo) * (Wd - m.l - m.r), y = (c) => m.t + (1 - c / ymax) * (Hd - m.t - m.b);
+    mtBox.replaceChildren();
+    const svg = svgEl('svg', { viewBox: '0 0 ' + Wd + ' ' + Hd, height: Hd, role: 'img', 'aria-label': 'Histogram of t-statistics from ' + N + ' strategies with no edge' }, mtBox);
+    svgEl('rect', { x: x(-2), y: m.t, width: x(2) - x(-2), height: Hd - m.t - m.b, fill: 'var(--band)' }, svg);
+    svgEl('line', { x1: m.l, x2: Wd - m.r, y1: y(0), y2: y(0), stroke: 'var(--rule-2)', 'stroke-width': 1 }, svg);
+    bins.forEach((c, i) => { if (!c) return; const t0 = lo + i * step; svgEl('rect', { x: x(t0) + 1, y: y(c), width: Math.max(1, x(t0 + step) - x(t0) - 2), height: y(0) - y(c), fill: t0 >= 2 ? 'var(--fail)' : 'var(--bar)' }, svg); });
+    [-4, -2, 0, 2, 4].forEach((t) => { const tx = svgEl('text', { x: x(t), y: Hd - 12, 'text-anchor': 'middle' }, svg); tx.textContent = sgn(t, 0); });
+    const best = Math.max.apply(null, mtT), bx = x(Math.max(lo, Math.min(hi, best)));
+    svgEl('line', { x1: bx, x2: bx, y1: m.t - 6, y2: Hd - m.b, stroke: 'var(--ink)', 'stroke-width': 1.5 }, svg);
+    const bl = svgEl('text', { x: bx + (bx > Wd - 110 ? -6 : 6), y: m.t + 4, class: 'lbl', 'text-anchor': bx > Wd - 110 ? 'end' : 'start' }, svg); bl.textContent = 'best: t ' + sgn(best, 2);
+    const over = mtT.filter((t) => t > 2).length, exp = N * (1 - Phi(2));
+    $('#mt-read').replaceChildren(
+      el('span', { cls: 'big', text: 'best t = ' + sgn(best, 2) }),
+      document.createTextNode(over + ' of ' + N.toLocaleString('en-US') + ' strategies cleared t > 2 (expected ' + exp.toFixed(1) + ')'), el('br'),
+      document.createTextNode('typical best from ' + N.toLocaleString('en-US') + ' tries: t ≈ ' + sgn(mtExp[N], 2)));
+    const ctx = { 288: 'The breakout search tried 288 variants. Pure chance would usually hand one of them t ≈ 2.8; the best real variant reached 0.94, because the variants share trades and the family lost money on average.', 560: 'The macro-release rule was picked from a 560-cell grid. Its cell ranked 37th, and after deflating for 560 tries the Sharpe ratio’s deflated value was 0.05. Independent data then confirmed it was noise.' };
+    $('#mt-context').textContent = ctx[N] || 'Each bar counts strategies whose true edge is zero; red bars are the ones a careless search would report. Variants in a real search share trades, so their t-statistics are correlated and the spread is a little narrower than shown.';
+  }
+  mtRange.addEventListener('input', mtSim);
+  $('#mt-run').addEventListener('click', () => { mtSeed = (mtSeed * 1103515245 + 12345) >>> 0; mtSim(); });
+
+  // =========================================================================================
+  // SESSION CLOCK
+  // =========================================================================================
+  const CLOCK = [
+    { a: 180, b: 510, name: 'Pre-open', title: 'Build the map', what: 'The dealer-gamma map is built from the SPX and ES option books: call resistance, put support, the gamma flip and per-strike exposure. Levels are graded on two axes and frozen to a levels file before 09:15.', items: ['Basis measured from same-second SPX/ES pairs, never modeled: three readings inside a 0.35-point band across six days.', 'Two-axis grade: historical hold rate × gamma magnitude.', 'Kill switch: no trading if contract liquidity is under 40% of normal.'], study: 's-levels' },
+    { a: 450, b: 510, name: '07:30', title: 'Macro releases', rel: true, what: 'CPI, PPI and NFP print at 07:30 CT. The first minute carries 10.7× the normal range, and the shock fades within the hour.', items: ['The 10-second order-flow rule traded here; it failed independent replication.', 'Release-hour extremes went unrevisited all session on 73% of release days.', 'The live framework bars entries within 30 minutes of high-impact releases.'], study: 's-cpi' },
+    { a: 510, b: 525, name: '', title: 'The opening range forms', what: 'Regular trading opens at 08:30 CT. The first 15 minutes set the opening range for the breakout study and the bar rate that predicts the rest of the morning.', items: ['First-15-minute bar rate vs the rest of the morning: r = 0.77.', 'V1 breakout range: 08:30–08:44:59 CT. V2: 08:30–08:59:59 CT.'], study: 's-gamma' },
+    { a: 525, b: 555, name: 'Read', title: 'Read the open', what: 'The pre-open board sets the possible range; the first bars confirm it. Breakout signals from the 15-minute range fire here.', items: ['Positive-gamma mornings ran a median 27 bars/hr against 39 for negative gamma.', 'Trades before 09:15 are logged as a separate sample.'], study: 's-orb' },
+    { a: 555, b: 885, name: 'Trading window', title: 'Trading window, 09:15–14:45 CT', what: 'Entries only at a graded level or the edge of balance. Order flow decides: an absorption flag against the position is a veto, and the exit is written before the click.', items: ['C# indicators: order-flow panel (verified 18/18 against a Python mirror), big-trade bubbles, bar logger.', 'Risk calculator sizes every trade; its Python port matches 3,000 of 3,000 cases.', 'Model B focus: failed retest of a broken level, break from the edge of balance.'], study: 's-orbgex' },
+    { a: 870, b: 900, name: 'Close', title: 'Into the cash close', what: 'The order-flow panel stops at 14:30 CT. The absorption study measured flags printed from 14:30 to the 15:00 close.', items: ['Fading the 14:30–15:00 move looked real in a 24-day pilot (t = 2.72) and failed a 129-session holdout (t = 0.08).', 'Absorption bars snap back less than ordinary bars (t = 3.7).'], study: 's-absorb' },
+    { a: 900, b: 990, name: 'Post-session', title: 'Score the prediction', what: 'The reconciler scores the frozen map against the tape: did price react where the map said it would? Every trade is journaled with setup, location quality and absorption flag.', items: ['Forward tests use fixed rules and sessions after the registration date only.', 'The prop-firm lifecycle model prices what a run of sessions is worth.'], study: 's-prop' },
+  ];
+  const ctrack = $('#ctrack'), caxis = $('#caxis'), crange = $('#clock-range');
+  const T0 = 180, T1 = 990, CP = (t) => (t - T0) / (T1 - T0) * 100;
+  const fmtT = (t) => String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0');
+  CLOCK.forEach((c, i) => {
+    const b = el('button', { type: 'button', cls: 'seg-span' + (c.rel ? ' rel' : ''), style: 'left:' + CP(c.a) + '%;width:' + (CP(c.b) - CP(c.a)) + '%', 'aria-label': c.title + ', ' + fmtT(c.a) + ' to ' + fmtT(c.b), title: c.title + ' · ' + fmtT(c.a) + '–' + fmtT(c.b), 'data-i': String(i) });
+    b.textContent = c.name;
+    b.addEventListener('click', () => { crange.value = String(c.rel ? c.a + 10 : Math.round((c.a + c.b) / 2 / 5) * 5); drawClock(); });
+    ctrack.append(b);
+  });
+  ctrack.append(el('i', { cls: 'needle', id: 'needle' }));
+  [180, 450, 510, 555, 870, 900, 990].forEach((t) => caxis.append(el('span', { cls: [450, 555, 900].includes(t) ? 'minor' : '', style: 'left:' + CP(t) + '%;' + (t === 180 ? 'transform:none' : t === 990 ? 'transform:translateX(-100%)' : ''), text: fmtT(t) })));
+  function drawClock() {
+    const t = +crange.value;
+    let idx = -1; CLOCK.forEach((c, i) => { if (t >= c.a && t < c.b) { if (idx < 0 || c.a >= CLOCK[idx].a) idx = i; } });
+    if (idx < 0) idx = CLOCK.length - 1;
+    const c = CLOCK[idx];
+    $('#clock-time').textContent = fmtT(t) + ' CT';
+    $('#clock-seg').textContent = c.title;
+    $('#needle').style.left = CP(t) + '%';
+    [...ctrack.querySelectorAll('.seg-span')].forEach((b) => b.classList.toggle('on', +b.dataset.i === idx));
+    const s = STUDIES.find((x) => x.id === c.study);
+    const open = el('button', { type: 'button', cls: 'btn small', text: 'Open the study: ' + s.title });
+    open.addEventListener('click', () => select(s.id, true));
+    $('#clock-detail').replaceChildren(
+      el('div', null, [el('h3', { text: c.title }), el('p', { text: c.what }), open]),
+      el('ul', null, c.items.map((x) => el('li', { text: x }))));
+  }
+  crange.addEventListener('input', drawClock); drawClock();
+
+  // =========================================================================================
+  // POINT-IN-TIME TIMELINE (illustration)
+  // =========================================================================================
+  const PIT = [
+    { l: 'Prior-quarter 10-Q filed', d: -55 },
+    { l: 'Analyst A estimate', d: -45 },
+    { l: 'Analyst B estimate, later stopped', d: -30, stop: -8 },
+    { l: 'Analyst C revision', d: -12 },
+    { l: 'Peer company reports', d: -9 },
+    { l: 'Option skew at the close', d: -1 },
+    { l: 'Analyst D estimate', d: 0 },
+    { l: 'Second peer reports', d: 3 },
+    { l: 'Restated accruals published', d: 28 },
+  ];
+  const D0 = -60, D1 = 30, DP = (d) => (d - D0) / (D1 - D0) * 100;
+  const pitRows = $('#pit-rows'), pitCut = $('#pit-cut');
+  let pitTiming = 'pre';
+  function drawPit() {
+    const cut = +pitCut.value;
+    $('#pit-cut-out').textContent = 'day ' + (cut > 0 ? '+' : cut < 0 ? '−' : '') + Math.abs(cut);
+    pitRows.replaceChildren();
+    let nIn = 0;
+    PIT.forEach((it, k) => {
+      const live = it.d <= cut && !(it.stop != null && it.stop <= cut);
+      if (live) nIn++;
+      const gr = 'grid-row:' + (k + 1) + ';grid-column:';
+      const row = el('div', { cls: 'pit-row ' + (live ? 'in' : 'out'), style: 'display:contents' });
+      const tr = el('div', { cls: 'pit-track', style: gr + '2' });
+      if (it.stop != null) tr.append(el('i', { style: 'left:' + DP(it.d) + '%;width:' + (DP(it.stop) - DP(it.d)) + '%' }));
+      else tr.append(el('i', { cls: 'pt', style: 'left:' + DP(it.d) + '%' }));
+      const status = live ? 'used' : it.d > cut ? 'not yet' : 'stopped';
+      row.append(el('div', { cls: 'pit-lab', style: gr + '1', text: it.l + ' (day ' + (it.d > 0 ? '+' : it.d < 0 ? '−' : '') + Math.abs(it.d) + ')' }), tr, el('div', { cls: 'pit-st', style: gr + '3', text: status }));
+      pitRows.append(row);
+    });
+    const ann = pitTiming === 'post' ? 1 : 0;
+    const over = el('div', { cls: 'pit-over', style: 'grid-row: 1 / span ' + PIT.length }, [el('i', { cls: 'cut', style: 'left:' + DP(cut) + '%' }), el('i', { cls: 'ann', style: 'left:' + DP(ann) + '%' })]);
+    pitRows.append(over);
+    const ax = el('div', { cls: 'pit-axis', style: 'grid-row: ' + (PIT.length + 1) });
+    [-60, -30, 0, 30].forEach((d) => ax.append(el('span', { style: 'left:' + DP(d) + '%;' + (d === -60 ? 'transform:none' : d === 30 ? 'transform:translateX(-100%)' : ''), text: d === 0 ? 'report day' : (d > 0 ? '+' : '−') + Math.abs(d) })));
+    pitRows.append(ax);
+    const msg = $('#pit-msg');
+    const retDay = pitTiming === 'post' ? 'the next trading day (+1)' : 'the report day itself';
+    if (cut >= 0) { msg.className = 'pit-msg warn'; msg.textContent = 'Leak: a cutoff on or after the report day lets ' + nIn + ' items in, including information the market did not have the day before. Solid line: cutoff. Dashed line: the day the announcement return is measured, ' + retDay + '.'; }
+    else if (cut < -1) { msg.className = 'pit-msg'; msg.textContent = 'Safe but wasteful: ' + nIn + ' of ' + PIT.length + ' items used. Information published between day ' + cut + ' and day −1 is thrown away. The announcement return is measured on ' + retDay + '.'; }
+    else { msg.className = 'pit-msg'; msg.textContent = 'The rule: ' + nIn + ' of ' + PIT.length + ' items used, everything known by the close on day −1 and nothing after. The stopped estimate drops out even though it was issued in time. The announcement return is measured on ' + retDay + '.'; }
+  }
+  pitCut.addEventListener('input', drawPit);
+  seg($('#pit-timing'), [{ v: 'pre', label: 'Before the open' }, { v: 'post', label: 'After the close' }], 'pre', (v) => { pitTiming = v; drawPit(); });
+  drawPit();
+
+  // ---------- links ----------
+  const facts = $('#facts');
+  const addFact = (label, node) => facts.append(el('dt', { text: label }), el('dd', null, node));
+  const link = (href, text) => el('a', { href, text, rel: 'noopener', target: '_blank' });
+  if (SITE.github) { const n = $('#nav-github'); n.href = 'https://github.com/' + SITE.github; n.hidden = false; n.target = '_blank'; n.rel = 'noopener'; addFact('GitHub', link('https://github.com/' + SITE.github, 'github.com/' + SITE.github)); }
+  if (SITE.linkedin) addFact('LinkedIn', link('https://www.linkedin.com/in/' + SITE.linkedin, 'linkedin.com/in/' + SITE.linkedin));
+  if (SITE.email) {
+    const t = el('span', { text: SITE.email }), b = el('button', { type: 'button', cls: 'copy', text: 'Copy' });
+    b.addEventListener('click', () => { const ok = () => { b.textContent = 'Copied'; setTimeout(() => { b.textContent = 'Copy'; }, 1600); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(SITE.email).then(ok, () => {}); });
+    addFact('Email', el('span', null, [t, b]));
+  }
+
+  // ---------- responsive redraws ----------
+  mtSim(); drawFrontier();
+  let lw1 = 0, lw2 = 0;
+  if (window.ResizeObserver) {
+    new ResizeObserver(() => { const w = frBox.clientWidth; if (Math.abs(w - lw1) > 4) { lw1 = w; drawFrontier(); } }).observe(frBox);
+    new ResizeObserver(() => { const w = mtBox.clientWidth; if (Math.abs(w - lw2) > 4) { lw2 = w; drawMt(); } }).observe(mtBox);
+  }
+})();
+</script>
+</body>
+</html>

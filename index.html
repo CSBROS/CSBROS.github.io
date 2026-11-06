@@ -84,9 +84,9 @@ input[type="range"] { width: 100%; accent-color: var(--accent); margin: 0; }
 .fig-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 .frow { display: grid; grid-template-columns: minmax(0, 17rem) minmax(0, 1fr) 8rem; gap: 6px 22px; align-items: center; width: calc(100% + 16px); padding: 11px 8px; margin-inline: -8px; border: 0; border-bottom: 1px solid var(--rule); background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .frow:hover, .frow:focus-visible { background: var(--hover); }
-.frow .lab { min-width: 0; }
-.frow .lab b { display: block; font-weight: 600; font-size: 15px; line-height: 1.3; }
-.frow .lab span { display: block; font-size: 12.5px; color: var(--muted); line-height: 1.4; margin-top: 2px; }
+.frow .flab { min-width: 0; }
+.frow .flab b { display: block; font-weight: 600; font-size: 15px; line-height: 1.3; }
+.frow .flab span { display: block; font-size: 12.5px; color: var(--muted); line-height: 1.4; margin-top: 2px; }
 .track { position: relative; height: 26px; }
 .track i { position: absolute; display: block; }
 .track .band { top: 0; bottom: 0; left: calc(6px + (100% - 12px) * 0.25); width: calc((100% - 12px) * 0.5); background: var(--band); }
@@ -286,8 +286,8 @@ footer p { margin: 0; max-width: 90ch; }
 }
 @media (max-width: 700px) {
   .frow { grid-template-columns: minmax(0, 1fr) 6.6rem; gap: 6px 14px; }
-  .frow .lab { grid-column: 1 / -1; }
-  .faxis .lab { display: none; }
+  .frow .flab { grid-column: 1 / -1; }
+  .faxis .flab { display: none; }
   .principles { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 560px) {
@@ -337,7 +337,7 @@ footer p { margin: 0; max-width: 90ch; }
     </div>
     <div id="forest-rows"></div>
     <div class="frow faxis" aria-hidden="true">
-      <div class="lab"></div>
+      <div class="flab"></div>
       <div class="track ticks">
         <span style="left: 6px">−4</span>
         <span style="left: calc(6px + (100% - 12px) * 0.25)">−2</span>
@@ -907,7 +907,7 @@ footer p { margin: 0; max-width: 90ch; }
   let forestMode = 'out';
   const rowEls = FOREST.map((r) => {
     const b = el('button', { type: 'button', cls: 'frow', style: '--c: var(--' + r.c + ')', 'aria-label': r.label + ', ' + r.tag + '. Open study.' });
-    const lab = el('span', { cls: 'lab' }, [el('b', { text: r.label }), el('span', { text: r.sub })]);
+    const lab = el('span', { cls: 'flab' }, [el('b', { text: r.label }), el('span', { text: r.sub })]);
     const tr = el('span', { cls: 'track' }, [el('i', { cls: 'band' }), el('i', { cls: 'zero' })]);
     const lnk = r.ins != null ? el('i', { cls: 'lnk' }) : null; if (lnk) tr.append(lnk);
     const hol = r.ins != null ? el('i', { cls: 'dot hollow' }) : null; if (hol) tr.append(hol);

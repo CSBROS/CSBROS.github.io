@@ -1,0 +1,430 @@
+{
+ "meta": {
+  "title": "3-Month Basis Portfolio",
+  "inception": "2026-10-19",
+  "launch": "2026-11-16",
+  "as_of": "2026-11-19",
+  "bench_name": "Russell 2000",
+  "bench_ticker": "IWM",
+  "cycle": 1,
+  "cycle_opened": "2026-10-19",
+  "cycle_review": "2027-01-19",
+  "plan": "Start with $50, add about $100 a month, hold positions on a 3-month basis and recycle them at each review.",
+  "source": "Robinhood fills, positions and closes; IWM (Russell 2000 ETF) prices from Robinhood market data."
+ },
+ "live": {
+  "value": 101.68,
+  "start_value": 102.63,
+  "cash": 7.92,
+  "deposits": 0,
+  "pnl": -0.95,
+  "bench_value": 99.35,
+  "bench_pnl": -3.28,
+  "twr": -0.00932,
+  "bench_twr": -0.03195,
+  "alpha": 0.02263
+ },
+ "pre": {
+  "twr": -0.33469,
+  "bench_twr": -0.01699,
+  "alpha": -0.31769
+ },
+ "inception": {
+  "twr": -0.34088,
+  "bench_twr": -0.0484,
+  "alpha": -0.29249
+ },
+ "series": [
+  {
+   "date": "2026-10-19",
+   "strategy": 96.188,
+   "bench": 99.662
+  },
+  {
+   "date": "2026-10-20",
+   "strategy": 95.766,
+   "bench": 101.315
+  },
+  {
+   "date": "2026-10-21",
+   "strategy": 97.116,
+   "bench": 101.572
+  },
+  {
+   "date": "2026-10-22",
+   "strategy": 92.512,
+   "bench": 101.642
+  },
+  {
+   "date": "2026-10-23",
+   "strategy": 90.653,
+   "bench": 101.304
+  },
+  {
+   "date": "2026-10-26",
+   "strategy": 87.481,
+   "bench": 101.759
+  },
+  {
+   "date": "2026-10-27",
+   "strategy": 97.164,
+   "bench": 102.931
+  },
+  {
+   "date": "2026-10-28",
+   "strategy": 97.457,
+   "bench": 103.339
+  },
+  {
+   "date": "2026-10-29",
+   "strategy": 97.831,
+   "bench": 104.338
+  },
+  {
+   "date": "2026-10-30",
+   "strategy": 91.851,
+   "bench": 102.619
+  },
+  {
+   "date": "2026-11-02",
+   "strategy": 87.351,
+   "bench": 102.549
+  },
+  {
+   "date": "2026-11-03",
+   "strategy": 87.427,
+   "bench": 102.788
+  },
+  {
+   "date": "2026-11-04",
+   "strategy": 84.662,
+   "bench": 104.342
+  },
+  {
+   "date": "2026-11-05",
+   "strategy": 78.307,
+   "bench": 99.551
+  },
+  {
+   "date": "2026-11-06",
+   "strategy": 82.612,
+   "bench": 100.54
+  },
+  {
+   "date": "2026-11-09",
+   "strategy": 78.431,
+   "bench": 101.582
+  },
+  {
+   "date": "2026-11-10",
+   "strategy": 73.898,
+   "bench": 101.052
+  },
+  {
+   "date": "2026-11-11",
+   "strategy": 76.099,
+   "bench": 101.956
+  },
+  {
+   "date": "2026-11-12",
+   "strategy": 74.505,
+   "bench": 100.282
+  },
+  {
+   "date": "2026-11-13",
+   "strategy": 74.453,
+   "bench": 99.958
+  },
+  {
+   "date": "2026-11-16",
+   "strategy": 66.531,
+   "bench": 98.301,
+   "strategy_live": 100.0,
+   "bench_live": 100.0,
+   "value": 102.63,
+   "bench_value": 102.63
+  },
+  {
+   "date": "2026-11-17",
+   "strategy": 65.896,
+   "bench": 96.9,
+   "strategy_live": 99.045,
+   "bench_live": 98.575,
+   "value": 101.65,
+   "bench_value": 101.17
+  },
+  {
+   "date": "2026-11-18",
+   "strategy": 65.187,
+   "bench": 97.285,
+   "strategy_live": 97.98,
+   "bench_live": 98.967,
+   "value": 100.56,
+   "bench_value": 101.57
+  },
+  {
+   "date": "2026-11-19",
+   "strategy": 65.912,
+   "bench": 95.16,
+   "strategy_live": 99.068,
+   "bench_live": 96.805,
+   "value": 101.68,
+   "bench_value": 99.35
+  }
+ ],
+ "open": [
+  {
+   "symbol": "USAR",
+   "name": "USA Rare Earth",
+   "qty": 9.291482,
+   "avg_cost": 8.0859,
+   "price": 6.87,
+   "value": 63.83,
+   "cost": 75.13,
+   "pnl": -11.3,
+   "ret": -0.15037,
+   "bench_ret": -0.05242,
+   "alpha": -0.09796,
+   "opened": "2026-11-09",
+   "weight": 0.6278
+  },
+  {
+   "symbol": "CVU",
+   "name": "CPI Aerostructures",
+   "qty": 5.0,
+   "avg_cost": 4.8,
+   "price": 4.55,
+   "value": 22.75,
+   "cost": 24.0,
+   "pnl": -1.25,
+   "ret": -0.05208,
+   "bench_ret": -0.06385,
+   "alpha": 0.01176,
+   "opened": "2026-11-09",
+   "weight": 0.2237
+  },
+  {
+   "symbol": "PRZO",
+   "name": "ParaZero Technologies",
+   "qty": 20.0,
+   "avg_cost": 0.4999,
+   "price": 0.3587,
+   "value": 7.17,
+   "cost": 10.0,
+   "pnl": -2.82,
+   "ret": -0.28246,
+   "bench_ret": -0.06385,
+   "alpha": -0.21861,
+   "opened": "2026-11-09",
+   "weight": 0.0705
+  }
+ ],
+ "closed": [
+  {
+   "symbol": "CVU",
+   "name": "CPI Aerostructures",
+   "qty": 1.0,
+   "opened": "2026-10-19",
+   "closed": "2026-11-09",
+   "cost": 4.73,
+   "proceeds": 4.78,
+   "pnl": 0.04,
+   "ret": 0.00951,
+   "bench_ret": 0.04416,
+   "alpha": -0.03465
+  },
+  {
+   "symbol": "PRZO",
+   "name": "ParaZero Technologies",
+   "qty": 20.0,
+   "opened": "2026-10-19",
+   "closed": "2026-11-09",
+   "cost": 10.5,
+   "proceeds": 10.02,
+   "pnl": -0.48,
+   "ret": -0.04572,
+   "bench_ret": 0.04151,
+   "alpha": -0.08724
+  },
+  {
+   "symbol": "USAR",
+   "name": "USA Rare Earth",
+   "qty": 14.0,
+   "opened": "2026-10-19",
+   "closed": "2026-11-09",
+   "cost": 129.77,
+   "proceeds": 119.43,
+   "pnl": -10.34,
+   "ret": -0.07966,
+   "bench_ret": 0.00321,
+   "alpha": -0.08288
+  }
+ ],
+ "fills": [
+  {
+   "ts": "2026-10-19T03:23:42.086Z",
+   "symbol": "USAR",
+   "side": "buy",
+   "qty": 2.0,
+   "price": 10.83,
+   "notional": 21.66,
+   "bench": 272.53,
+   "session": "all_day_hours",
+   "record": "pre"
+  },
+  {
+   "ts": "2026-10-19T11:10:21.51Z",
+   "symbol": "PRZO",
+   "side": "buy",
+   "qty": 20.0,
+   "price": 0.5249,
+   "notional": 10.5,
+   "bench": 271.95,
+   "session": "extended_hours",
+   "record": "pre"
+  },
+  {
+   "ts": "2026-10-19T19:57:43.783Z",
+   "symbol": "CVU",
+   "side": "buy",
+   "qty": 1.0,
+   "price": 4.73,
+   "notional": 4.73,
+   "bench": 271.26,
+   "session": "extended_hours",
+   "record": "pre"
+  },
+  {
+   "ts": "2026-11-09T19:06:12.499Z",
+   "symbol": "USAR",
+   "side": "buy",
+   "qty": 0.77369,
+   "price": 8.97,
+   "notional": 6.94,
+   "bench": 282.155,
+   "session": "regular_hours",
+   "record": "pre"
+  },
+  {
+   "ts": "2026-11-09T20:03:11.003Z",
+   "symbol": "CVU",
+   "side": "sell",
+   "qty": 1.0,
+   "price": 4.775,
+   "notional": 4.78,
+   "bench": 283.24,
+   "session": "regular_hours",
+   "record": "pre"
+  },
+  {
+   "ts": "2026-11-09T20:03:20.508Z",
+   "symbol": "PRZO",
+   "side": "sell",
+   "qty": 20.0,
+   "price": 0.5009,
+   "notional": 10.02,
+   "bench": 283.24,
+   "session": "regular_hours",
+   "record": "pre"
+  },
+  {
+   "ts": "2026-11-09T20:03:35.041Z",
+   "symbol": "USAR",
+   "side": "buy",
+   "qty": 1.645358,
+   "price": 8.995,
+   "notional": 14.8,
+   "bench": 283.24,
+   "session": "regular_hours",
+   "record": "pre"
+  },
+  {
+   "ts": "2026-11-09T20:09:12.77Z",
+   "symbol": "USAR",
+   "side": "buy",
+   "qty": 9.872434,
+   "price": 9.015,
+   "notional": 89.0,
+   "bench": 283.24,
+   "session": "regular_hours",
+   "record": "pre"
+  },
+  {
+   "ts": "2026-11-09T22:12:44.708Z",
+   "symbol": "USAR",
+   "side": "sell",
+   "qty": 14.0,
+   "price": 8.531,
+   "notional": 119.43,
+   "bench": 282.24,
+   "session": "extended_hours",
+   "record": "pre"
+  },
+  {
+   "ts": "2026-11-09T22:14:02.972Z",
+   "symbol": "USAR",
+   "side": "buy",
+   "qty": 5.0,
+   "price": 8.54,
+   "notional": 42.7,
+   "bench": 282.24,
+   "session": "extended_hours",
+   "record": "pre"
+  },
+  {
+   "ts": "2026-11-09T22:16:16.251Z",
+   "symbol": "CVU",
+   "side": "buy",
+   "qty": 5.0,
+   "price": 4.8,
+   "notional": 24.0,
+   "bench": 282.24,
+   "session": "extended_hours",
+   "record": "pre"
+  },
+  {
+   "ts": "2026-11-09T22:35:44.747Z",
+   "symbol": "PRZO",
+   "side": "buy",
+   "qty": 20.0,
+   "price": 0.4999,
+   "notional": 10.0,
+   "bench": 282.24,
+   "session": "extended_hours",
+   "record": "pre"
+  },
+  {
+   "ts": "2026-11-10T13:30:40.254Z",
+   "symbol": "USAR",
+   "side": "buy",
+   "qty": 2.0,
+   "price": 8.19,
+   "notional": 16.38,
+   "bench": 279.52,
+   "session": "all_day_hours",
+   "record": "pre"
+  },
+  {
+   "ts": "2026-11-17T20:05:11.919Z",
+   "symbol": "USAR",
+   "side": "buy",
+   "qty": 1.0,
+   "price": 6.5774,
+   "notional": 6.58,
+   "bench": 269.02,
+   "session": "regular_hours",
+   "record": "live"
+  },
+  {
+   "ts": "2026-11-19T19:06:12.857Z",
+   "symbol": "USAR",
+   "side": "buy",
+   "qty": 1.0,
+   "price": 6.845,
+   "notional": 6.84,
+   "bench": 265.05,
+   "session": "regular_hours",
+   "record": "live"
+  }
+ ]
+}
